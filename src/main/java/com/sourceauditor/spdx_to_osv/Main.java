@@ -129,9 +129,13 @@ public class Main {
                                 version.get()));
                     }
                     for (ExternalRef externalRef:pkg.getExternalRefs()) {
-                        Optional<OsvVulnerabilityRequest> pnv = new ExternalRefParser(externalRef).getPackageNameVersion();
-                        if (pnv.isPresent()) {
-                            pvSet.add(pnv.get());
+                        try {
+                            Optional<OsvVulnerabilityRequest> pnv = new ExternalRefParser(externalRef).getPackageNameVersion();
+                            if (pnv.isPresent()) {
+                                pvSet.add(pnv.get());
+                            }
+                        } catch (InvalidExternalRefPattern e) {
+                            // TODO: add warnings
                         }
                     }
                     // Get additional versions and commits from download locations

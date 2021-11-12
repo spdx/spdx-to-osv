@@ -57,6 +57,14 @@ public class OsvPackage {
         this.purl = purl;
     }
     
+    /**
+     * Create an OSV package with no purl and the default ecosystem of "OSV-Fuzz"
+     * @param name Package name
+     */
+    public OsvPackage(String name) {
+        this(name, "OSV-Fuzz", null);
+    }
+
     @Override
     public int hashCode() {
         if (Objects.nonNull(purl)) {
