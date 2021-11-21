@@ -4,6 +4,8 @@
  */
 package com.sourceauditor.spdx_to_osv;
 
+import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,6 +16,11 @@ import org.spdx.library.model.ExternalRef;
 import com.sourceauditor.spdx_to_osv.osvmodel.OsvPackage;
 import com.sourceauditor.spdx_to_osv.osvmodel.OsvVulnerabilityRequest;
 
+import us.springett.parsers.cpe.Cpe;
+import us.springett.parsers.cpe.CpeParser;
+import us.springett.parsers.cpe.exceptions.CpeParsingException;
+import us.springett.parsers.cpe.values.Part;
+
 /**
  * Parses an ExternalRef
  * 
@@ -22,19 +29,12 @@ import com.sourceauditor.spdx_to_osv.osvmodel.OsvVulnerabilityRequest;
  */
 public class ExternalRefParser {
     
-    public static final Pattern CPE22_PATTERN = Pattern.compile("[c][pP][eE]:(/[AHOaho]?)(:[A-Za-z0-9\\\\._\\\\-~%]*){0,6}");
-    public static final Pattern CPE23_PATTERN = Pattern.compile("cpe:2\\\\.3:([aho\\\\*\\\\­])(:(((\\\\?*|\\\\*?)([a­zA­Z0­9\\\\­\\\\._]|(\\\\\\\\[\\\\\\\\\\\\*\\\\?!\\#$$%&'\\\\(\\\\)\\\\+,/:;<=>@\\\\[\\\\]\\\\^`\\\\{\\\\|}~]))+(\\\\?*|\\\\*?))|[\\\\*\\\\­])){5}(:(([a­zA­Z]{2,3}(­([a­zA­Z]{2}|[0­9]{3}))?)|[\\\\*\\\\­]))(:(((\\\\?*|\\\\*?)([a­zA­Z0­9\\\\­\\\\._]|(\\\\\\\\[\\\\\\\\\\\\*\\\\?!\\#$$%&'\\\\(\\\\)\\\\+,/:;<=>@\\\\[\\\\]\\\\^`\\\\{\\\\|}~]))+(\\\\?*|\\\\*?))|[\\\\*\\\\­])){4}");
-    
-    public enum CPE_PART {
-        NONE,
-        HARDWARE,   // h
-        OPERATING_SYSTEM,   // o
-        APPLICATION     // a
-    }
-    
-    private ExternalRef externalRef;
-    Optional<OsvVulnerabilityRequest> packageNameVersion = Optional.empty();
-    Optional<CPE_PART> cpePart = Optional.empty();
+	static final Pattern SWH_PATTERN = Pattern.compile("swh:1:(cnt|dir|rev|rel|snp):([0123456789abcdef]{40})$");
+    static final Pattern PURL_PATTERN = Pattern.compile("(.+):(.+)/(.+)/(.+)@([^?]+)(\\?.+#.+)*$");
+	
+	private ExternalRef externalRef;
+    Optional<OsvVulnerabilityRequest> osvVulnerabilityRequest = Optional.empty();
+    Optional<Part> cpePart = Optional.empty();
     Optional<String> vendor = Optional.empty(); // CPE vendor
     Optional<String> update = Optional.empty(); // CPE update
     Optional<String> edition = Optional.empty(); // CPE edition
@@ -45,13 +45,20 @@ public class ExternalRefParser {
     private Optional<String> cpeOther = Optional.empty(); // CPE other
     
 
-    public ExternalRefParser(ExternalRef externalRef) throws InvalidSPDXAnalysisException, InvalidExternalRefPattern {
+    /**
+     * @param externalRef The ExteranlRef to be parsed
+     * @throws InvalidSPDXAnalysisException
+     * @throws InvalidExternalRefPattern
+     * @throws IOException
+     * @throws SwhException
+     */
+    public ExternalRefParser(ExternalRef externalRef) throws InvalidSPDXAnalysisException, InvalidExternalRefPattern, IOException, SwhException {
         this.externalRef = externalRef;
         // Parse the PackageNameVersion
         if (externalRef.getReferenceType().getIndividualURI().endsWith("/cpe22Type")) {
-            parseCpe22(externalRef.getReferenceLocator());
+            parseCpe(externalRef.getReferenceLocator());
         } else if (externalRef.getReferenceType().getIndividualURI().endsWith("/cpe23Type")) {
-            parseCpe32(externalRef.getReferenceLocator());
+            parseCpe(externalRef.getReferenceLocator());
         } else if (externalRef.getReferenceType().getIndividualURI().endsWith("/maven-central")) {
             parseMavenCentral(externalRef.getReferenceLocator());
         } else if (externalRef.getReferenceType().getIndividualURI().endsWith("/npm")) {
@@ -65,28 +72,70 @@ public class ExternalRefParser {
         } else if (externalRef.getReferenceType().getIndividualURI().endsWith("/swh")) {
             parseSwh(externalRef.getReferenceLocator());
         } else {
-            packageNameVersion = Optional.empty();
+            osvVulnerabilityRequest = Optional.empty();
         }
     }
 
     /**
      * @param referenceLocator
+     * @throws InvalidExternalRefPattern 
+     * @throws SwhException 
+     * @throws IOException 
      */
-    private void parseSwh(String referenceLocator) {
-        // TODO Auto-generated method stub
-        throw new RuntimeException("Not yet implemented");
+    private void parseSwh(String referenceLocator) throws InvalidExternalRefPattern, IOException, SwhException {
+        Matcher matcher = SWH_PATTERN.matcher(referenceLocator);
+        if (!matcher.matches()) {
+        	throw new InvalidExternalRefPattern("Software Heritage reference locator '"+referenceLocator+
+        			"' does not match the pattern '"+SWH_PATTERN.toString());
+        }
+        this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(matcher.group(2)));
     }
 
     /**
      * @param referenceLocator
+     * @throws InvalidExternalRefPattern 
      */
-    private void paserPurl(String referenceLocator) {
-        // TODO Auto-generated method stub
-        throw new RuntimeException("Not yet implemented");
-        
+    private void paserPurl(String referenceLocator) throws InvalidExternalRefPattern {
+        Matcher match = PURL_PATTERN.matcher(referenceLocator);
+        if (!match.matches()) {
+        	throw new InvalidExternalRefPattern("Purl reference locator '"+referenceLocator+
+        			"' does not match the pattern '"+PURL_PATTERN.toString());
+        }
+        String type = match.group(2);
+        String packageName = match.group(4);
+        String version = match.group(5);
+        if ("github".equals(type)) {
+        	this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(version));
+        } else {
+	        this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
+	        		new OsvPackage(packageName, purlTypeToOsvEcosystem(type), 
+	        				referenceLocator), version));
+        }
     }
 
     /**
+	 * @param purlType purl type
+	 * @return Osv Scheme
+	 */
+	private String purlTypeToOsvEcosystem(String purlType) {
+		if (Objects.isNull(purlType) || purlType.isEmpty()) {
+			return "OSS-Fuzz";
+		} else if (purlType.equals("pypi")) {
+			return "PyPI";
+		} else if (purlType.equals("golang")) {
+			return "Go";
+		} else if (purlType.equals("maven")) {
+			return "Maven";
+		} else if (purlType.equals("npm")) {
+			return "npm";
+		} else if (purlType.equals("nuget")) {
+			return "NuGet";
+		} else {
+			return "OSS-Fuzz";
+		}
+	}
+
+	/**
      * @param referenceLocator
      */
     private void parseBower(String referenceLocator) {
@@ -119,141 +168,44 @@ public class ExternalRefParser {
         if (parts.length < 3) {
             throw new InvalidExternalRefPattern("Maven central string must have at least the group and artifact");
         }
-        cpePart = Optional.of(CPE_PART.APPLICATION);
-        this.packageNameVersion = Optional.of(new PackageNameVersion());
+        cpePart = Optional.of(Part.APPLICATION);
+        // TODO Auto-generated method stub
+        throw new RuntimeException("Not yet implemented");
+//        this.packageNameVersion = Optional.of(new PackageNameVersion());
     }
 
-    /**
-     * @param referenceLocator
-     * @throws InvalidSPDXAnalysisException 
-     * @throws InvalidExternalRefPattern 
-     */
-    private void parseCpe32(String referenceLocator) throws InvalidExternalRefPattern, InvalidSPDXAnalysisException {
-        Matcher matcher = CPE23_PATTERN.matcher(referenceLocator);
-        if (matcher.matches()) {
-            String partStr = matcher.group(1).toLowerCase().trim();
-            if (partStr.equals("-") || partStr.equals("*")) {
-                cpePart = Optional.of(CPE_PART.NONE);
-            } else if (partStr.equals("h")) {
-                cpePart = Optional.of(CPE_PART.HARDWARE);
-            } else if (partStr.equals("o")) {
-                cpePart = Optional.of(CPE_PART.OPERATING_SYSTEM);
-            } else if (partStr.equals("a")) {
-                cpePart = Optional.of(CPE_PART.APPLICATION);
-            } else {
-                throw new InvalidExternalRefPattern("CPE23 external ref locater "+externalRef.getReferenceLocator() +
-                        " contains an invalid part string " + matcher.group(1));
-            }
-            if (matcher.groupCount() > 1 && !matcher.group(2).trim().isEmpty() &&
-                    !"-".equals(matcher.group(2).trim()) && !"*".equals(matcher.group(2).trim())) {
-                // vendor
-                vendor = Optional.of(matcher.group(2));
-            }
-            if (matcher.groupCount() > 2 && !matcher.group(3).trim().isEmpty() &&
-                    !"-".equals(matcher.group(3).trim()) && !"*".equals(matcher.group(3).trim())) {
-                // product
-                if (matcher.groupCount() > 3 && !matcher.group(4).trim().isEmpty() &&
-                        !"-".equals(matcher.group(4).trim()) && !"*".equals(matcher.group(4).trim())) {
-                    // version
-                    packageNameVersion = Optional.of(new OsvVulnerabilityRequest(new OsvPackage(matcher.group(3)), matcher.group(4)));
-                } else {
-                    packageNameVersion = Optional.of(new OsvVulnerabilityRequest(new OsvPackage(matcher.group(3)), null));
-                }
-            }
-            
-            if (matcher.groupCount() > 4 && !matcher.group(5).trim().isEmpty()  &&
-                    !"-".equals(matcher.group(5).trim()) && !"*".equals(matcher.group(5).trim())) {
-                // update
-                this.update = Optional.of(matcher.group(5));
-            }
-            if (matcher.groupCount() > 5 && !matcher.group(6).trim().isEmpty() &&
-                    !"-".equals(matcher.group(6).trim()) && !"*".equals(matcher.group(6).trim())) {
-                // edition
-                this.edition =  Optional.of(matcher.group(6));
-            }
-            if (matcher.groupCount() > 6 && !matcher.group(7).trim().isEmpty() &&
-                    !"-".equals(matcher.group(7).trim()) && !"*".equals(matcher.group(7).trim())) {
-                // language
-                this.language = Optional.of(matcher.group(7));
-            }
-            if (matcher.groupCount() > 7 && !matcher.group(8).trim().isEmpty() &&
-                    !"-".equals(matcher.group(8).trim()) && !"*".equals(matcher.group(8).trim())) {
-                // language
-                this.swEdition = Optional.of(matcher.group(8));
-            }
-            if (matcher.groupCount() > 8 && !matcher.group(9).trim().isEmpty() &&
-                    !"-".equals(matcher.group(9).trim()) && !"*".equals(matcher.group(9).trim())) {
-                // language
-                this.targetSw = Optional.of(matcher.group(9));
-            }
-            if (matcher.groupCount() > 9 && !matcher.group(10).trim().isEmpty() &&
-                    !"-".equals(matcher.group(10).trim()) && !"*".equals(matcher.group(10).trim())) {
-                // language
-                this.targetHw = Optional.of(matcher.group(10));
-            }
-            if (matcher.groupCount() > 10 && !matcher.group(11).trim().isEmpty() &&
-                    !"-".equals(matcher.group(11).trim()) && !"*".equals(matcher.group(11).trim())) {
-                // language
-                this.cpeOther = Optional.of(matcher.group(10));
-            }
-        } else {
-            throw new InvalidExternalRefPattern("CPE23 external ref locater "+externalRef.getReferenceLocator() +
-                    " does not match the pattern " + CPE23_PATTERN.toString());
-        }
-    }
-
+ 
     /**
      * Parses the CPE22 format per https://cpe.mitre.org/files/cpe-specification_2.2.pdf
      * @param referenceLocator
      * @throws InvalidSPDXAnalysisException 
      * @throws InvalidExternalRefPattern 
      */
-    private void parseCpe22(String referenceLocator) throws InvalidExternalRefPattern, InvalidSPDXAnalysisException {
-        Matcher matcher = CPE22_PATTERN.matcher(referenceLocator);
-        if (matcher.matches()) {
-            String partStr = matcher.group(1).toLowerCase().trim();
-            if (partStr.isEmpty()) {
-                cpePart = Optional.of(CPE_PART.NONE);
-            } else if (partStr.equals("/h")) {
-                cpePart = Optional.of(CPE_PART.HARDWARE);
-            } else if (partStr.equals("/o")) {
-                cpePart = Optional.of(CPE_PART.OPERATING_SYSTEM);
-            } else if (partStr.equals("/a")) {
-                cpePart = Optional.of(CPE_PART.APPLICATION);
-            } else {
-                throw new InvalidExternalRefPattern("CPE22 external ref locater "+externalRef.getReferenceLocator() +
-                        " contains an invalid part string " + matcher.group(1));
-            }
-            if (matcher.groupCount() > 1 && !matcher.group(2).trim().isEmpty()) {
-                // vendor
-                vendor = Optional.of(matcher.group(2));
-            }
-            if (matcher.groupCount() > 2 && !matcher.group(3).trim().isEmpty()) {
-                // product
-                if (matcher.groupCount() > 3 && !matcher.group(4).trim().isEmpty()) {
-                    // version
-                    packageNameVersion = Optional.of(new OsvVulnerabilityRequest(new OsvPackage(matcher.group(3)), matcher.group(4)));
-                } else {
-                    packageNameVersion = Optional.of(new OsvVulnerabilityRequest(new OsvPackage(matcher.group(3)), null));
-                }
-            }
-            
-            if (matcher.groupCount() > 4 && !matcher.group(5).trim().isEmpty()) {
-                // update
-                this.update = Optional.of(matcher.group(5));
-            }
-            if (matcher.groupCount() > 5 && !matcher.group(6).trim().isEmpty()) {
-                // edition
-                this.edition =  Optional.of(matcher.group(6));
-            }
-            if (matcher.groupCount() > 6 && !matcher.group(7).trim().isEmpty()) {
-                // language
-                this.language = Optional.of(matcher.group(7));
-            }
-        } else {
-            throw new InvalidExternalRefPattern("CPE22 external ref locater "+externalRef.getReferenceLocator() +
-                    " does not match the pattern " + CPE22_PATTERN.toString());
-        }
+    private void parseCpe(String referenceLocator) throws InvalidExternalRefPattern, InvalidSPDXAnalysisException {
+        try {
+			Cpe parsedCpe = CpeParser.parse(referenceLocator);
+			this.cpeOther = Optional.ofNullable(parsedCpe.getOther());
+			this.cpePart  = Optional.ofNullable(parsedCpe.getPart());
+			this.edition = Optional.ofNullable(parsedCpe.getEdition());
+			this.language = Optional.ofNullable(parsedCpe.getLanguage());
+			String product = parsedCpe.getProduct();
+			String version = parsedCpe.getVersion();
+			if (Objects.nonNull(product) && !product.isEmpty()) {
+				if (Objects.nonNull(version) && !version.isEmpty()) {
+					 osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(new OsvPackage(product), version));
+				} else {
+					osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(new OsvPackage(product), null));
+				}
+			} else {
+				osvVulnerabilityRequest = Optional.empty();
+			}
+			this.swEdition = Optional.ofNullable(parsedCpe.getEdition());
+			this.targetHw = Optional.ofNullable(parsedCpe.getTargetHw());
+			this.update = Optional.ofNullable(parsedCpe.getUpdate());
+			this.vendor = Optional.ofNullable(parsedCpe.getVendor());
+		} catch (CpeParsingException e) {
+			throw new InvalidExternalRefPattern("Invalid CPE 2.2 reference",e);
+		}
     }
 
     /**
@@ -266,14 +218,14 @@ public class ExternalRefParser {
     /**
      * @return the packageNameVersion
      */
-    public Optional<OsvVulnerabilityRequest> getPackageNameVersion() {
-        return packageNameVersion;
+    public Optional<OsvVulnerabilityRequest> osvVulnerabilityRequest() {
+        return osvVulnerabilityRequest;
     }
 
     /**
      * @return the cpePart
      */
-    public Optional<CPE_PART> getCpePart() {
+    public Optional<Part> getCpePart() {
         return cpePart;
     }
 

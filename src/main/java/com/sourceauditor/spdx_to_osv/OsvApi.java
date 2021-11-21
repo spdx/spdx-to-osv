@@ -68,34 +68,38 @@ public class OsvApi {
         con.setRequestProperty("Accept", "application/json");
         con.setDoOutput(true);
         con.connect();
-        try(OutputStream out = con.getOutputStream()) {
-            out.write(json);
-        }
-        String response;
-        try(BufferedReader reader = new BufferedReader(
-                new InputStreamReader(con.getInputStream(),StandardCharsets.UTF_8))) {
-            StringBuilder sb = new StringBuilder();
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-            response = sb.toString();
-        }
-        if (con.getResponseCode() == 200) {
-            OsvVulnerabilityResponse responseJson = GSON.fromJson(response, OsvVulnerabilityResponse.class);
-            if (Objects.nonNull(responseJson.getVulns())) {
-                return responseJson.getVulns();
-            } else {
-                return new ArrayList<OsvVulnerability>();
-            }
-        } else {
-            OsvErrorResponse responseJson = GSON.fromJson(response, OsvErrorResponse.class);
-            String msg = "Error getting vulnerability data";
-            if (Objects.nonNull(responseJson) && Objects.nonNull(responseJson.getMessage()) &&
-                    !responseJson.getMessage().isEmpty()) {
-                msg += responseJson.getMessage();
-            }
-            throw new SpdxToOsvException(msg);
+        try {
+	        try(OutputStream out = con.getOutputStream()) {
+	            out.write(json);
+	        }
+	        String response;
+	        try(BufferedReader reader = new BufferedReader(
+	                new InputStreamReader(con.getInputStream(),StandardCharsets.UTF_8))) {
+	            StringBuilder sb = new StringBuilder();
+	            String line = null;
+	            while ((line = reader.readLine()) != null) {
+	                sb.append(line);
+	            }
+	            response = sb.toString();
+	        }
+	        if (con.getResponseCode() == 200) {
+	            OsvVulnerabilityResponse responseJson = GSON.fromJson(response, OsvVulnerabilityResponse.class);
+	            if (Objects.nonNull(responseJson.getVulns())) {
+	                return responseJson.getVulns();
+	            } else {
+	                return new ArrayList<OsvVulnerability>();
+	            }
+	        } else {
+	            OsvErrorResponse responseJson = GSON.fromJson(response, OsvErrorResponse.class);
+	            String msg = "Error getting vulnerability data";
+	            if (Objects.nonNull(responseJson) && Objects.nonNull(responseJson.getMessage()) &&
+	                    !responseJson.getMessage().isEmpty()) {
+	                msg += responseJson.getMessage();
+	            }
+	            throw new SpdxToOsvException(msg);
+	        }
+        } finally {
+        	con.disconnect();
         }
     }
 }

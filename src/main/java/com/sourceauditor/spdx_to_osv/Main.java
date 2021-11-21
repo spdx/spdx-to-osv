@@ -130,13 +130,17 @@ public class Main {
                     }
                     for (ExternalRef externalRef:pkg.getExternalRefs()) {
                         try {
-                            Optional<OsvVulnerabilityRequest> pnv = new ExternalRefParser(externalRef).getPackageNameVersion();
+                            Optional<OsvVulnerabilityRequest> pnv = new ExternalRefParser(externalRef).osvVulnerabilityRequest();
                             if (pnv.isPresent()) {
                                 pvSet.add(pnv.get());
                             }
                         } catch (InvalidExternalRefPattern e) {
-                            // TODO: add warnings
-                        }
+                            System.err.println("Warning: Error parsing external ref: "+e.getMessage());
+                        } catch (IOException e) {
+                        	System.err.println("Warning: I/O Error parsing external ref: "+e.getMessage());
+						} catch (SwhException e) {
+							System.err.println("Warning: Software Heritage API error while processing external ref: "+e.getMessage());
+						}
                     }
                     // Get additional versions and commits from download locations
                     Optional<String> downloadLocation = pkg.getDownloadLocation();
