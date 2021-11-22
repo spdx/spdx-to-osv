@@ -30,7 +30,7 @@ import us.springett.parsers.cpe.values.Part;
 public class ExternalRefParser {
     
 	static final Pattern SWH_PATTERN = Pattern.compile("swh:1:(cnt|dir|rev|rel|snp):([0123456789abcdef]{40})$");
-    static final Pattern PURL_PATTERN = Pattern.compile("(.+):(.+)/(.+)/(.+)@([^?]+)(\\?.+#.+)*$");
+    static final Pattern PURL_PATTERN = Pattern.compile("pkg:((?<type>[^?/#@]+)/)((?<namespace>[^?#@]+)/)?(?<name>[^?#@]+)(@(?<version>[^?#]+))?(\\?[^#]+)*(#.+)*$");
 	
 	private ExternalRef externalRef;
     Optional<OsvVulnerabilityRequest> osvVulnerabilityRequest = Optional.empty();
@@ -101,11 +101,13 @@ public class ExternalRefParser {
         	throw new InvalidExternalRefPattern("Purl reference locator '"+referenceLocator+
         			"' does not match the pattern '"+PURL_PATTERN.toString());
         }
-        String type = match.group(2);
-        String packageName = match.group(4);
-        String version = match.group(5);
-        if ("github".equals(type)) {
+        String type = match.group("type");
+        String packageName = match.group("name");
+        String version = match.group("version");
+        if ("github".equals(type) || "bitbucket".equals(type)) {
         	this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(version));
+        } else if ("docker".equals(type) && Objects.nonNull(version) && version.startsWith("sha256:")) {
+        	this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(version.substring("sha256:".length())));
         } else {
 	        this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
 	        		new OsvPackage(packageName, purlTypeToOsvEcosystem(type), 

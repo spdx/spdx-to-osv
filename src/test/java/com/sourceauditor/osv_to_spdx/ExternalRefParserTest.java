@@ -144,7 +144,7 @@ public class ExternalRefParserTest {
     	ExternalRefParser erp = new ExternalRefParser(er);
     	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
         assertTrue(ovr.isPresent());
-        assertEquals("244fd47e07d1004f0aed9c", ovr.get().getCommit());
+        assertEquals("244fd47e07d1014f0aed9c", ovr.get().getCommit());
     }
     
     @Test
@@ -212,9 +212,9 @@ public class ExternalRefParserTest {
     	ExternalRefParser erp = new ExternalRefParser(er);
     	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("annotations", ovr.get().getPackage().getName());
+    	assertEquals("genproto", ovr.get().getPackage().getName());
     	assertEquals("pkg:golang/google.golang.org/genproto#googleapis/api/annotations", ovr.get().getPackage().getPurl());
-    	assertEquals("OSS-Fuzz", ovr.get().getPackage().getEcosystem());
+    	assertEquals("Go", ovr.get().getPackage().getEcosystem());
     }
     
     @Test
@@ -250,7 +250,7 @@ public class ExternalRefParserTest {
     	ExternalRefParser erp = new ExternalRefParser(er);
     	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("@angular/animation", ovr.get().getPackage().getName());
+    	assertEquals("animation", ovr.get().getPackage().getName());
     	assertEquals("12.3.1", ovr.get().getVersion());
     	assertEquals("pkg:npm/%40angular/animation@12.3.1", ovr.get().getPackage().getPurl());
     	assertEquals("npm", ovr.get().getPackage().getEcosystem());
@@ -306,7 +306,7 @@ public class ExternalRefParserTest {
     	assertEquals("curl", ovr.get().getPackage().getName());
     	assertEquals("7.50.3-1.fc25", ovr.get().getVersion());
     	assertEquals("pkg:rpm/fedora/curl@7.50.3-1.fc25?arch=i386&distro=fedora-25", ovr.get().getPackage().getPurl());
-    	assertEquals("Debian", ovr.get().getPackage().getEcosystem());
+    	assertEquals("OSS-Fuzz", ovr.get().getPackage().getEcosystem());
         
         er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
                 ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("purl"), 
@@ -317,6 +317,6 @@ public class ExternalRefParserTest {
     	assertEquals("curl", ovr.get().getPackage().getName());
     	assertEquals("7.56.1-1.1.", ovr.get().getVersion());
     	assertEquals("pkg:rpm/opensuse/curl@7.56.1-1.1.?arch=i386&distro=opensuse-tumbleweed", ovr.get().getPackage().getPurl());
-    	assertEquals("Debian", ovr.get().getPackage().getEcosystem());
+    	assertEquals("OSS-Fuzz", ovr.get().getPackage().getEcosystem());
     }
 }
