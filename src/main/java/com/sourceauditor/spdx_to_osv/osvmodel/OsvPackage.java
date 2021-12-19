@@ -62,7 +62,7 @@ public class OsvPackage {
      * @param name Package name
      */
     public OsvPackage(String name) {
-        this(name, "OSV-Fuzz", null);
+        this(name, "OSS-Fuzz", null);
     }
 
     @Override

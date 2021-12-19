@@ -32,6 +32,7 @@ public class ExternalRefParser {
 	static final Pattern SWH_PATTERN = Pattern.compile("swh:1:(cnt|dir|rev|rel|snp):([0123456789abcdef]{40})$");
     static final Pattern PURL_PATTERN = Pattern.compile("pkg:((?<type>[^?/#@]+)/)((?<namespace>[^?#@]+)/)?(?<name>[^?#@]+)(@(?<version>[^?#]+))?(\\?[^#]+)*(#.+)*$");
 	
+    private boolean useMavenGroupInPkgName = false;
 	private ExternalRef externalRef;
     Optional<OsvVulnerabilityRequest> osvVulnerabilityRequest = Optional.empty();
     Optional<Part> cpePart = Optional.empty();
@@ -44,7 +45,6 @@ public class ExternalRefParser {
     private Optional<String> targetHw = Optional.empty(); // CPE target_hw
     private Optional<String> cpeOther = Optional.empty(); // CPE other
     
-
     /**
      * @param externalRef The ExteranlRef to be parsed
      * @throws InvalidSPDXAnalysisException
@@ -53,7 +53,20 @@ public class ExternalRefParser {
      * @throws SwhException
      */
     public ExternalRefParser(ExternalRef externalRef) throws InvalidSPDXAnalysisException, InvalidExternalRefPattern, IOException, SwhException {
-        this.externalRef = externalRef;
+    	this(externalRef, false);
+    }
+
+    /**
+     * @param externalRef The ExteranlRef to be parsed
+     * @param useMavenGroupInPkgName flag to indicate if the maven group name should be included in the package name (e.g. org.spdx.spdx.spdx-java-tools)
+     * @throws InvalidSPDXAnalysisException
+     * @throws InvalidExternalRefPattern
+     * @throws IOException
+     * @throws SwhException
+     */
+    public ExternalRefParser(ExternalRef externalRef, boolean useMavenGroupInPkgName) throws InvalidSPDXAnalysisException, InvalidExternalRefPattern, IOException, SwhException {
+        this.useMavenGroupInPkgName = useMavenGroupInPkgName;
+    	this.externalRef = externalRef;
         // Parse the PackageNameVersion
         if (externalRef.getReferenceType().getIndividualURI().endsWith("/cpe22Type")) {
             parseCpe(externalRef.getReferenceLocator());
@@ -141,24 +154,52 @@ public class ExternalRefParser {
      * @param referenceLocator
      */
     private void parseBower(String referenceLocator) {
-        // TODO Auto-generated method stub
-        throw new RuntimeException("Not yet implemented");
+        String[] parts = referenceLocator.split("#");
+        cpePart = Optional.of(Part.APPLICATION);
+        String pkg = parts[0];
+        String version = null;
+        if (parts.length > 1) {
+        	version = parts[1];
+        }
+        
+        this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
+        		new OsvPackage(pkg), version));
     }
 
     /**
      * @param referenceLocator
      */
     private void parseNuget(String referenceLocator) {
-        // TODO Auto-generated method stub
-        throw new RuntimeException("Not yet implemented");
+        String[] parts = referenceLocator.split("/");
+        cpePart = Optional.of(Part.APPLICATION);
+        String pkg = parts[0];
+        String purl = "pkg:nuget/" + pkg;
+        String version = null;
+        if (parts.length > 1) {
+        	version = parts[1];
+        	purl = purl + "@" + version;
+        }
+        
+        this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
+        		new OsvPackage(pkg, "NuGet", purl), version));
     }
 
     /**
      * @param referenceLocator
      */
     private void parseNpm(String referenceLocator) {
-        // TODO Auto-generated method stub
-        throw new RuntimeException("Not yet implemented");
+        String[] parts = referenceLocator.split("@");
+        cpePart = Optional.of(Part.APPLICATION);
+        String pkg = parts[0];
+        String purl = "pkg:npm/" + pkg;
+        String version = null;
+        if (parts.length > 1) {
+        	version = parts[1];
+        	purl = purl + "@" + version;
+        }
+        
+        this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
+        		new OsvPackage(pkg, "npm", purl), version));
     }
 
     /**
@@ -167,13 +208,25 @@ public class ExternalRefParser {
      */
     private void parseMavenCentral(String referenceLocator) throws InvalidExternalRefPattern {
         String[] parts = referenceLocator.split(":");
-        if (parts.length < 3) {
+        if (parts.length < 2) {
             throw new InvalidExternalRefPattern("Maven central string must have at least the group and artifact");
         }
         cpePart = Optional.of(Part.APPLICATION);
-        // TODO Auto-generated method stub
-        throw new RuntimeException("Not yet implemented");
-//        this.packageNameVersion = Optional.of(new PackageNameVersion());
+        String pkg;
+        if (this.useMavenGroupInPkgName) {
+        	pkg = parts[0] + "." + parts[1];
+        } else {
+        	pkg = parts[1];
+        }
+        String purl = "pkg:maven/" + parts[0] + "/" + parts[1];
+        String version = null;
+        if (parts.length > 2) {
+        	version = parts[2];
+        	purl = purl + "@" + version;
+        }
+        
+        this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
+        		new OsvPackage(pkg, "Maven", purl), version));
     }
 
  
@@ -286,5 +339,12 @@ public class ExternalRefParser {
     public Optional<String> getCpeOther() {
         return cpeOther;
     }
-    
+
+	/**
+	 * @return flag to indicate if the maven group name should be included in the package name (e.g. org.spdx.spdx.spdx-java-tools)
+	 */
+	public boolean isUseMavenGroupInPkgName() {
+		return useMavenGroupInPkgName;
+	}
+
 }

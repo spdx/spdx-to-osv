@@ -319,4 +319,79 @@ public class ExternalRefParserTest {
     	assertEquals("pkg:rpm/opensuse/curl@7.56.1-1.1.?arch=i386&distro=opensuse-tumbleweed", ovr.get().getPackage().getPurl());
     	assertEquals("OSS-Fuzz", ovr.get().getPackage().getEcosystem());
     }
+    
+    @Test
+    public void testMaven() throws InvalidSPDXAnalysisException, InvalidExternalRefPattern, IOException, SwhException {
+    	ExternalRef er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
+                ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("maven-central"), 
+                "org.spdx:tools-java:2.2.2", null);
+    	ExternalRefParser erp = new ExternalRefParser(er);
+    	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
+    	assertTrue(ovr.isPresent());
+    	assertEquals("tools-java", ovr.get().getPackage().getName());
+    	assertEquals("2.2.2", ovr.get().getVersion());
+    	assertEquals("pkg:maven/org.spdx/tools-java@2.2.2", ovr.get().getPackage().getPurl());
+    	assertEquals("Maven", ovr.get().getPackage().getEcosystem());
+    	
+    	er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
+                ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("maven-central"), 
+                "org.spdx:tools-java:2.2.2", null);
+    	erp = new ExternalRefParser(er, true);
+    	ovr = erp.osvVulnerabilityRequest();
+    	assertTrue(ovr.isPresent());
+    	assertEquals("org.spdx.tools-java", ovr.get().getPackage().getName());
+    	assertEquals("2.2.2", ovr.get().getVersion());
+    	assertEquals("pkg:maven/org.spdx/tools-java@2.2.2", ovr.get().getPackage().getPurl());
+    	
+    	er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
+                ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("maven-central"), 
+                "org.spdx:tools-java", null);
+    	erp = new ExternalRefParser(er, true);
+    	ovr = erp.osvVulnerabilityRequest();
+    	assertTrue(ovr.isPresent());
+    	assertEquals("org.spdx.tools-java", ovr.get().getPackage().getName());
+    	assertTrue(ovr.get().getVersion() == null);
+    	assertEquals("pkg:maven/org.spdx/tools-java", ovr.get().getPackage().getPurl());
+    }
+    
+    @Test
+    public void testNpm() throws InvalidSPDXAnalysisException, InvalidExternalRefPattern, IOException, SwhException {
+    	ExternalRef er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
+                ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("npm"), 
+                "http-server@0.3.0", null);
+    	ExternalRefParser erp = new ExternalRefParser(er);
+    	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
+    	assertTrue(ovr.isPresent());
+    	assertEquals("http-server", ovr.get().getPackage().getName());
+    	assertEquals("0.3.0", ovr.get().getVersion());
+    	assertEquals("pkg:npm/http-server@0.3.0", ovr.get().getPackage().getPurl());
+    	assertEquals("npm", ovr.get().getPackage().getEcosystem());
+    }
+    
+    @Test
+    public void testNuget() throws InvalidSPDXAnalysisException, InvalidExternalRefPattern, IOException, SwhException {
+    	ExternalRef er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
+                ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("nuget"), 
+                "Microsoft.AspNet.MVC/5.0.0", null);
+    	ExternalRefParser erp = new ExternalRefParser(er);
+    	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
+    	assertTrue(ovr.isPresent());
+    	assertEquals("Microsoft.AspNet.MVC", ovr.get().getPackage().getName());
+    	assertEquals("5.0.0", ovr.get().getVersion());
+    	assertEquals("pkg:nuget/Microsoft.AspNet.MVC@5.0.0", ovr.get().getPackage().getPurl());
+    	assertEquals("NuGet", ovr.get().getPackage().getEcosystem());
+    }
+    
+    @Test
+    public void testBower() throws InvalidSPDXAnalysisException, InvalidExternalRefPattern, IOException, SwhException {
+    	ExternalRef er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
+                ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("bower"), 
+                "modernizr#2.6.2", null);
+    	ExternalRefParser erp = new ExternalRefParser(er);
+    	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
+    	assertTrue(ovr.isPresent());
+    	assertEquals("modernizr", ovr.get().getPackage().getName());
+    	assertEquals("2.6.2", ovr.get().getVersion());
+    	assertEquals("OSS-Fuzz", ovr.get().getPackage().getEcosystem());
+    }
 }
