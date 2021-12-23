@@ -145,7 +145,7 @@ public class Main {
                     // Get additional versions and commits from download locations
                     Optional<String> downloadLocation = pkg.getDownloadLocation();
                     if (downloadLocation.isPresent()) {
-                        Optional<OsvVulnerabilityRequest> pnv = new DownloadLocationParser(downloadLocation.get()).getPackageNameVersion();
+                        Optional<OsvVulnerabilityRequest> pnv = new DownloadLocationParser(downloadLocation.get()).getOsvVulnerabilityRequest();
                         if (pnv.isPresent()) {
                             pvSet.add(pnv.get());
                         }

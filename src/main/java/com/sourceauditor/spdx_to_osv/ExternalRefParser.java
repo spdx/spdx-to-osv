@@ -191,7 +191,7 @@ public class ExternalRefParser {
         String[] parts = referenceLocator.split("@");
         cpePart = Optional.of(Part.APPLICATION);
         String pkg = parts[0];
-        String purl = "pkg:npm/" + pkg;
+        String purl = "pkg:npm/" + pkg.replaceAll("@", "%40");
         String version = null;
         if (parts.length > 1) {
         	version = parts[1];

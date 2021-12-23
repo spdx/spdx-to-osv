@@ -50,12 +50,14 @@ public class OsvApiTest {
         OsvVulnerabilityRequest request = new OsvVulnerabilityRequest("6879efc2c1596d11a6a6ad296f80063b558d5e0f");  // commit taken from the example provided for the OSV API
         List<OsvVulnerability> result = OsvApi.getInstance().queryVulnerabilities(request);
         assertTrue(result.size() > 0);
-        assertEquals("harfbuzz", result.get(0).getOsvPackage().getName());
+        assertTrue(result.get(0).getAffected().size() > 0);
+        assertEquals("harfbuzz", result.get(0).getAffected().get(0).getOsvPackage().getName());
         // Package and Version
         request = new OsvVulnerabilityRequest(new OsvPackage("jinja2", "PyPI", null), "2.4.1");
         result = OsvApi.getInstance().queryVulnerabilities(request);
         assertTrue(result.size() > 0);
-        assertEquals("jinja2", result.get(0).getOsvPackage().getName());
+        assertTrue(result.get(0).getAffected().size() > 0);
+        assertEquals("jinja2", result.get(0).getAffected().get(0).getOsvPackage().getName());
         // not in database
         request = new OsvVulnerabilityRequest(new OsvPackage("tools-java", "OSV-Fuzz", null), "1.0.1");
         result = OsvApi.getInstance().queryVulnerabilities(request);
