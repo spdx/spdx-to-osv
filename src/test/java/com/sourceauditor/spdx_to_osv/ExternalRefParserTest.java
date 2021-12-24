@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright (c) 2021 Source Auditor Inc.
  */
-package com.sourceauditor.osv_to_spdx;
+package com.sourceauditor.spdx_to_osv;
 
 import static org.junit.Assert.*;
 
@@ -25,9 +25,6 @@ import org.spdx.library.referencetype.ListedReferenceTypes;
 import org.spdx.storage.IModelStore;
 import org.spdx.storage.simple.InMemSpdxStore;
 
-import com.sourceauditor.spdx_to_osv.ExternalRefParser;
-import com.sourceauditor.spdx_to_osv.InvalidExternalRefPattern;
-import com.sourceauditor.spdx_to_osv.SwhException;
 import com.sourceauditor.spdx_to_osv.osvmodel.OsvVulnerabilityRequest;
 
 import us.springett.parsers.cpe.values.Part;

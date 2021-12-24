@@ -20,6 +20,7 @@ import org.spdx.library.InvalidSPDXAnalysisException;
 import org.spdx.library.model.ExternalRef;
 import org.spdx.library.model.SpdxModelFactory;
 import org.spdx.library.model.SpdxPackage;
+import org.spdx.storage.IModelStore;
 import org.spdx.storage.ISerializableModelStore;
 import org.spdx.tools.InvalidFileNameException;
 import org.spdx.tools.SpdxToolsHelper;
@@ -104,67 +105,83 @@ public class Main {
             }
         }
     }
+    
+    /**
+     * Writes OSV JSON data to the outStream based on an SPDX model store and document URI
+     * @param fromStore Model store containing the SPDX model
+     * @param documentUri Document URI for the document to use
+     * @param writer writer the OSV file
+     * @throws SpdxToOsvException
+     * @throws IOException 
+     * @throws InvalidSPDXAnalysisException 
+     */
+    public static void spdxToOsv(IModelStore fromStore, String documentUri, Writer writer) throws SpdxToOsvException, IOException, InvalidSPDXAnalysisException {
+    	OsvApi osvApi = OsvApi.getInstance();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Set<OsvVulnerabilityRequest> pvSet = new HashSet<>();
+        SpdxModelFactory.getElements(fromStore, documentUri, null, SpdxPackage.class).forEach(oPackage -> {
+            try {
+                SpdxPackage pkg = (SpdxPackage)oPackage;
+                Optional<String> packageName = pkg.getName();
+                Optional<String> version = pkg.getVersionInfo();
+                if (packageName.isPresent() && version.isPresent()) {
+                    pvSet.add(new OsvVulnerabilityRequest(new OsvPackage(packageName.get(), "OSS-Fuzz", null),
+                            version.get()));
+                }
+                for (ExternalRef externalRef:pkg.getExternalRefs()) {
+                    try {
+                        Optional<OsvVulnerabilityRequest> pnv = new ExternalRefParser(externalRef).osvVulnerabilityRequest();
+                        if (pnv.isPresent()) {
+                            pvSet.add(pnv.get());
+                        }
+                    } catch (InvalidExternalRefPattern e) {
+                        System.err.println("Warning: Error parsing external ref: "+e.getMessage());
+                    } catch (IOException e) {
+                    	System.err.println("Warning: I/O Error parsing external ref: "+e.getMessage());
+					} catch (SwhException e) {
+						System.err.println("Warning: Software Heritage API error while processing external ref: "+e.getMessage());
+					}
+                }
+                // Get additional versions and commits from download locations
+                Optional<String> downloadLocation = pkg.getDownloadLocation();
+                if (downloadLocation.isPresent()) {
+                    Optional<OsvVulnerabilityRequest> pnv = new DownloadLocationParser(downloadLocation.get()).getOsvVulnerabilityRequest();
+                    if (pnv.isPresent()) {
+                        pvSet.add(pnv.get());
+                    }
+                }
+            } catch (InvalidSPDXAnalysisException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        // call the API on all the package name versions
+        writer.append('[');
+        int numVulns = 0;
+        for (OsvVulnerabilityRequest pnv:pvSet) {
+            for (OsvVulnerability vulnerability:osvApi.queryVulnerabilities(pnv)) {
+                if (numVulns > 0) {
+	                writer.append(',');
+	                writer.append('\n');
+                }
+                gson.toJson(vulnerability, writer);
+                numVulns++;
+            }
+        }
+        writer.append(']');
+    }
 
     /**
-     * Write OSV JSON data to the outStream based on an SPDX input stream
+     * Writes OSV JSON data to the outStream based on an SPDX input stream
      * @param inStream Stream for the SPDX file
      * @param inputFileType Serialization type for the input file stream
      * @param writer writer the OSV file
      * @throws SpdxToOsvException 
      */
-    private static void spdxToOsv(InputStream inStream, SerFileType inputFileType, Writer writer) throws SpdxToOsvException {
+    public static void spdxToOsv(InputStream inStream, SerFileType inputFileType, Writer writer) throws SpdxToOsvException {
         try {
             ISerializableModelStore fromStore = SpdxToolsHelper.fileTypeToStore(inputFileType);
             String documentUri = fromStore.deSerialize(inStream, false);
-            OsvApi osvApi = OsvApi.getInstance();
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            Set<OsvVulnerabilityRequest> pvSet = new HashSet<>();
-            SpdxModelFactory.getElements(fromStore, documentUri, null, SpdxPackage.class).forEach(oPackage -> {
-                try {
-                    SpdxPackage pkg = (SpdxPackage)oPackage;
-                    Optional<String> packageName = pkg.getName();
-                    Optional<String> version = pkg.getVersionInfo();
-                    if (packageName.isPresent() && version.isPresent()) {
-                        pvSet.add(new OsvVulnerabilityRequest(new OsvPackage(packageName.get(), "OSS-Fuzz", null),
-                                version.get()));
-                    }
-                    for (ExternalRef externalRef:pkg.getExternalRefs()) {
-                        try {
-                            Optional<OsvVulnerabilityRequest> pnv = new ExternalRefParser(externalRef).osvVulnerabilityRequest();
-                            if (pnv.isPresent()) {
-                                pvSet.add(pnv.get());
-                            }
-                        } catch (InvalidExternalRefPattern e) {
-                            System.err.println("Warning: Error parsing external ref: "+e.getMessage());
-                        } catch (IOException e) {
-                        	System.err.println("Warning: I/O Error parsing external ref: "+e.getMessage());
-						} catch (SwhException e) {
-							System.err.println("Warning: Software Heritage API error while processing external ref: "+e.getMessage());
-						}
-                    }
-                    // Get additional versions and commits from download locations
-                    Optional<String> downloadLocation = pkg.getDownloadLocation();
-                    if (downloadLocation.isPresent()) {
-                        Optional<OsvVulnerabilityRequest> pnv = new DownloadLocationParser(downloadLocation.get()).getOsvVulnerabilityRequest();
-                        if (pnv.isPresent()) {
-                            pvSet.add(pnv.get());
-                        }
-                    }
-                } catch (InvalidSPDXAnalysisException ex) {
-                    throw new RuntimeException(ex);
-                }
-            });
-            // call the API on all the package name versions
-            writer.append('[');
-            for (OsvVulnerabilityRequest pnv:pvSet) {
-                for (OsvVulnerability vulnerability:osvApi.queryVulnerabilities(pnv)) {
-                    gson.toJson(vulnerability, writer);
-                    writer.append(',');
-                    writer.append('\n');
-                }
-            }
-            writer.append(']');
-            // 
+            spdxToOsv(fromStore, documentUri, writer);
         } catch (InvalidSPDXAnalysisException e) {
             throw new SpdxToOsvException("Error reading the SPDX input file",e);
         } catch (IOException e) {
