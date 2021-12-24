@@ -70,7 +70,9 @@ public class OsvApi {
         con.connect();
         try {
 	        try(OutputStream out = con.getOutputStream()) {
-	            out.write(json);
+	        	if (Objects.nonNull(out)) {
+	        		out.write(json);
+	        	}
 	        }
 	        String response;
 	        try(BufferedReader reader = new BufferedReader(

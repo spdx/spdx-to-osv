@@ -7,18 +7,97 @@
   <version>0.0.1</version>
   <packaging>jar</packaging>
 
-  <name>osv-to-spdx</name>
-  <url>http://maven.apache.org</url>
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+  <name>spdx-to-osv</name>
+  <url>https://github.com/goneall/spdx-to-osv</url>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>goneall</id>
+			<name>Gary O'Neall</name>
+			<email>gary@sourceauditor.com</email>
+			<organization>Source Auditor Inc.</organization>
+			<organizationUrl>http://sourceauditor.com</organizationUrl>
+		</developer>
+	</developers>
+	<organization>
+		<name>Source Auditor Inc.</name>
+		<url>http://sourceauditor.com</url>
+	</organization>
+	<scm>
+		<url>https://github.com/goneall/spdx-to-osv</url>
+		<connection>https://github.com/goneall/spdx-to-osv.git</connection>
+		<developerConnection>https://github.com/goneall/spdx-to-osv.git</developerConnection>
+	</scm>
+	<issueManagement>
+		<system>Github</system>
+		<url>https://github.com/goneall/spdx-to-osv/issues</url>
+	</issueManagement>
+	<description>Produces an OSV vulnerability JSON report from an SPDX file</description>
+	<ciManagement>
+		<system>Github Actions</system>
+		<url>https://github.com/goneall/spdx-to-osv/actions</url>
+	</ciManagement>
+    <distributionManagement>
+      <repository>
+        <id>ossrh</id>
+        <name>spdx-to-osv</name>
+        <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+      </repository>
+	</distributionManagement>
+    <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	  <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+	  <sonar.organization>spdx</sonar.organization>
+	  <sonar.projectKey>spdx-to-osv</sonar.projectKey>
+    </properties>
+	<profiles>
+		<profile>
+			<id>doclint-java8-disable</id>
+			<activation>
+				<jdk>[1.8,)</jdk>
+			</activation>
+			<properties>
+				<javadoc.opts>-Xdoclint:none</javadoc.opts>
+			</properties>
+		</profile>
+		<profile>
+			<id>gpg-signing</id>
+			<build>
+				<plugins>
+					<plugin>
+		      			<groupId>org.apache.maven.plugins</groupId>
+		      			<artifactId>maven-gpg-plugin</artifactId>
+		      			<version>1.6</version>
+		      			<executions>
+		        			<execution>
+		          				<id>sign-artifacts</id>
+		          				<phase>verify</phase>
+		          				<goals>
+		            				<goal>sign</goal>
+		          				</goals>
+		          				<configuration>
+		              				<keyname>${gpg.keyname}</keyname>
+		              				<passphraseServerId>${gpg.keyname}</passphraseServerId>
+		            			</configuration>
+		        			</execution>
+		      			</executions>
+	    			</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>4.13.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -32,4 +111,150 @@
     	<version>2.0.2</version>
     </dependency>
   </dependencies>
+    <build>
+  		<resources>
+			<resource>
+				<targetPath>META-INF</targetPath>
+				<filtering>false</filtering>
+				<directory>.</directory>
+				<includes>
+					<include>LICENSE</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</testResource>
+			<testResource>
+				<filtering>false</filtering>
+				<directory>test-resources</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+			</testResource>
+		</testResources>
+		<plugins>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-compiler-plugin</artifactId>
+			<version>3.6.1</version>
+			<configuration>
+				<source>1.8</source>
+				<target>1.8</target>
+				<encoding>${project.build.sourceEncoding}</encoding>
+				<showDeprecation>true</showDeprecation>
+				<showWarnings>true</showWarnings>
+				<optimize>true</optimize>
+			</configuration>
+		</plugin>
+		<plugin>
+		  <artifactId>maven-assembly-plugin</artifactId>
+		  <configuration>
+		    <archive>
+		      <manifest>
+		        <mainClass>com.sourceauditor.spdx_to_osv.Main</mainClass>
+		      </manifest>
+		    </archive>
+		    <descriptorRefs>
+		      <descriptorRef>jar-with-dependencies</descriptorRef>
+		    </descriptorRefs>
+		  </configuration>
+		  <executions>
+		    <execution>
+		      <id>make-assembly</id>
+		      <phase>package</phase>
+		      <goals>
+		        <goal>single</goal>
+		      </goals>
+		    </execution>
+		  </executions>
+		</plugin>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-javadoc-plugin</artifactId>
+			<version>2.9</version>
+			<configuration>
+				<quiet>true</quiet>
+				<source>8</source>
+				<javadocExecutable>${env.JAVA_HOME}/bin/javadoc</javadocExecutable>
+				<additionalparam>-Xdoclint:none</additionalparam>
+			</configuration>
+			<executions>
+				<execution>
+					<id>attach-javadocs</id>
+					<configuration>
+						<additionalparam>${javadoc.opts}</additionalparam>
+					</configuration>
+					<goals>
+						<goal>jar</goal>
+					</goals>
+				</execution>
+			</executions>
+		</plugin>
+	   	<plugin>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-source-plugin</artifactId>
+	      <version>3.2.1</version>
+	      <executions>
+	        <execution>
+	          <id>attach-sources</id>
+	          <phase>verify</phase>
+	          <goals>
+	            <goal>jar-no-fork</goal>
+	          </goals>
+	        </execution>
+	      </executions>
+	    </plugin>
+		<plugin>
+			<groupId>org.spdx</groupId>
+				<artifactId>spdx-maven-plugin</artifactId>
+				<version>0.5.3</version>
+				<executions>
+					<execution>
+						<id>build-spdx</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>createSPDX</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<spdxDocumentNamespace>https://sourceauditor.com/documents/spdx-to-osv-{$version}</spdxDocumentNamespace>					
+					<defaultFileCopyright>Copyright (c) 2021 Source Auditor Inc.</defaultFileCopyright>
+					<defaultFileContributors>
+						<param>Gary O'Neall</param>
+					</defaultFileContributors>
+					<defaultLicenseInformationInFile>Apache-2.0</defaultLicenseInformationInFile>
+					<defaultFileConcludedLicense>Apache-2.0</defaultFileConcludedLicense>
+					<defaultFileNotice>Licensed under the Apache License, Version 2.0 (the "License");
+	  you may not use this file except in compliance with the License.
+	  You may obtain a copy of the License at
+	
+	      http://www.apache.org/licenses/LICENSE-2.0
+	
+	  Unless required by applicable law or agreed to in writing, software
+	  distributed under the License is distributed on an "AS IS" BASIS,
+	  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	  See the License for the specific language governing permissions and
+	  limitations under the License.</defaultFileNotice>
+					<licenseDeclared>Apache-2.0</licenseDeclared>
+					<licenseConcluded>Apache-2.0</licenseConcluded>
+					<creators>
+						<param>Person: Gary O'Neall</param>
+					</creators>
+					<originator>Person: Gary O'Neall</originator>
+				</configuration>
+          </plugin>
+	</plugins>
+  </build>
 </project>
