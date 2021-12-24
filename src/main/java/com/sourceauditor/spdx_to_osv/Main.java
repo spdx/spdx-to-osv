@@ -5,6 +5,7 @@
 package com.sourceauditor.spdx_to_osv;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -95,6 +96,7 @@ public class Main {
                 throw new SpdxToOsvException("Invalid file extension for input file "+fromFile.getName());
             }
             writer = new OutputStreamWriter(new FileOutputStream(toFile), StandardCharsets.UTF_8);
+            inStream = new FileInputStream(fromFile);
             spdxToOsv(inStream, inputFileType, writer);
         } finally {
             if (Objects.nonNull(inStream)) {
