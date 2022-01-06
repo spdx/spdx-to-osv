@@ -60,7 +60,8 @@ public class OsvApi {
      */
     public List<OsvVulnerability> queryVulnerabilities(OsvVulnerabilityRequest packageNameVersion) throws IOException, SpdxToOsvException {
         HttpURLConnection con = (HttpURLConnection)(apiUrl.openConnection());
-        byte[] json = GSON.toJson(packageNameVersion).getBytes(StandardCharsets.UTF_8);
+        String pkgNameVersionJson = GSON.toJson(packageNameVersion);
+        byte[] json = pkgNameVersionJson.getBytes(StandardCharsets.UTF_8);
         int len = json.length;
         con.setRequestMethod("POST");
         con.setFixedLengthStreamingMode(len);

@@ -325,7 +325,7 @@ public class ExternalRefParserTest {
     	ExternalRef er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
                 ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("maven-central"), 
                 "org.spdx:tools-java:2.2.2", null);
-    	ExternalRefParser erp = new ExternalRefParser(er);
+    	ExternalRefParser erp = new ExternalRefParser(er, false);
     	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
     	assertEquals("tools-java", ovr.get().getPackage().getName());
@@ -339,7 +339,7 @@ public class ExternalRefParserTest {
     	erp = new ExternalRefParser(er, true);
     	ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("org.spdx.tools-java", ovr.get().getPackage().getName());
+    	assertEquals("org.spdx:tools-java", ovr.get().getPackage().getName());
     	assertEquals("2.2.2", ovr.get().getVersion());
     	assertEquals("pkg:maven/org.spdx/tools-java@2.2.2", ovr.get().getPackage().getPurl());
     	
@@ -349,7 +349,7 @@ public class ExternalRefParserTest {
     	erp = new ExternalRefParser(er, true);
     	ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("org.spdx.tools-java", ovr.get().getPackage().getName());
+    	assertEquals("org.spdx:tools-java", ovr.get().getPackage().getName());
     	assertTrue(ovr.get().getVersion() == null);
     	assertEquals("pkg:maven/org.spdx/tools-java", ovr.get().getPackage().getPurl());
     }
