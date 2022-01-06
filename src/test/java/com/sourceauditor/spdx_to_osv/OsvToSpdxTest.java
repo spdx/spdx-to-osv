@@ -348,4 +348,41 @@ public class OsvToSpdxTest {
 			});
 		}
 	}
+	
+	@Test
+	public void testNpmExternalRefLog4j() throws InvalidSPDXAnalysisException, SpdxToOsvException, IOException {
+		InMemSpdxStore modelStore = new InMemSpdxStore();
+		ModelCopyManager copyManager = new ModelCopyManager();
+		String documentUri = "https://org.spdx.documents/this/is/a/test";
+		SpdxDocument doc = SpdxModelFactory.createSpdxDocument(modelStore, documentUri, copyManager);
+		ExternalRef externalRef = doc.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
+				ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("maven-central"), 
+				"org.apache.logging.log4j:log4j-core:2.15.0", null);
+		SpdxPackage log4jPackage = doc.createPackage(modelStore.getNextId(IdType.SpdxId, documentUri), 
+				"log4j-core", new SpdxNoAssertionLicense(), "NOASSERTION", new SpdxNoAssertionLicense())
+				.setFilesAnalyzed(false)
+				.addExternalRef(externalRef)
+				.build();
+		Relationship describesRelationship = doc.createRelationship(log4jPackage, RelationshipType.DESCRIBES, null);
+		doc.addRelationship(describesRelationship);
+		StringWriter writer = new StringWriter();
+		Main.spdxToOsv(modelStore, documentUri, writer);
+		String resultStr = writer.toString();
+		Type listType = new TypeToken<List<OsvVulnerability>>(){}.getType();
+		List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
+		assertTrue(result.size() > 0);
+		boolean foundPkg = false;
+		for (OsvVulnerability vuln:result) {
+			for (OsvAffected affected:vuln.getAffected()) {
+				if ("org.apache.logging.log4j:log4j-core".equals(affected.getOsvPackage().getName())) {
+					foundPkg = true;
+					break;
+				}
+				if (foundPkg) {
+					break;
+				}
+			}
+		}
+		assertTrue(foundPkg);
+	}
 }

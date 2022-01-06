@@ -32,7 +32,7 @@ public class ExternalRefParser {
 	static final Pattern SWH_PATTERN = Pattern.compile("swh:1:(cnt|dir|rev|rel|snp):([0123456789abcdef]{40})$");
     static final Pattern PURL_PATTERN = Pattern.compile("pkg:((?<type>[^?/#@]+)/)((?<namespace>[^?#@]+)/)?(?<name>[^?#@]+)(@(?<version>[^?#]+))?(\\?[^#]+)*(#.+)*$");
 	
-    private boolean useMavenGroupInPkgName = false;
+    private boolean useMavenGroupInPkgName = true;
 	private ExternalRef externalRef;
     Optional<OsvVulnerabilityRequest> osvVulnerabilityRequest = Optional.empty();
     Optional<Part> cpePart = Optional.empty();
@@ -53,7 +53,7 @@ public class ExternalRefParser {
      * @throws SwhException
      */
     public ExternalRefParser(ExternalRef externalRef) throws InvalidSPDXAnalysisException, InvalidExternalRefPattern, IOException, SwhException {
-    	this(externalRef, false);
+    	this(externalRef, true);
     }
 
     /**
@@ -214,7 +214,7 @@ public class ExternalRefParser {
         cpePart = Optional.of(Part.APPLICATION);
         String pkg;
         if (this.useMavenGroupInPkgName) {
-        	pkg = parts[0] + "." + parts[1];
+        	pkg = parts[0] + ":" + parts[1];
         } else {
         	pkg = parts[1];
         }
