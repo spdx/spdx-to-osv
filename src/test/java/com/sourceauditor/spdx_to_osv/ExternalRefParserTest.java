@@ -222,7 +222,7 @@ public class ExternalRefParserTest {
     	ExternalRef er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
                 ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("purl"), 
                 "pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?packaging=sources", null);
-    	ExternalRefParser erp = new ExternalRefParser(er);
+    	ExternalRefParser erp = new ExternalRefParser(er, false);
     	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
     	assertEquals("batik-anim", ovr.get().getPackage().getName());
@@ -233,7 +233,14 @@ public class ExternalRefParserTest {
         er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
                 ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("purl"), 
                 "pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?repository_url=repo.spring.io/release", null);
-    	erp = new ExternalRefParser(er);
+    	erp = new ExternalRefParser(er, true);
+    	ovr = erp.osvVulnerabilityRequest();
+    	assertTrue(ovr.isPresent());
+    	assertEquals("org.apache.xmlgraphics:batik-anim", ovr.get().getPackage().getName());
+    	assertEquals("1.9.1", ovr.get().getVersion());
+    	assertEquals("pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?repository_url=repo.spring.io/release", ovr.get().getPackage().getPurl());
+    	assertEquals("Maven", ovr.get().getPackage().getEcosystem());
+    	erp = new ExternalRefParser(er, false);
     	ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
     	assertEquals("batik-anim", ovr.get().getPackage().getName());
