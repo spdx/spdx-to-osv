@@ -121,6 +121,11 @@ public class ExternalRefParser {
         	this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(version));
         } else if ("docker".equals(type) && Objects.nonNull(version) && version.startsWith("sha256:")) {
         	this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(version.substring("sha256:".length())));
+        } else if ("maven".equals(type) && this.useMavenGroupInPkgName) {
+        	packageName = match.group("namespace").replaceAll("/", ".") + ":" + packageName;
+        	this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
+	        		new OsvPackage(packageName, purlTypeToOsvEcosystem(type), 
+	        				referenceLocator), version));
         } else {
 	        this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
 	        		new OsvPackage(packageName, purlTypeToOsvEcosystem(type), 
