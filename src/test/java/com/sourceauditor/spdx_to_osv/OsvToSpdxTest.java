@@ -30,6 +30,7 @@ import org.spdx.library.model.license.SpdxNoAssertionLicense;
 import org.spdx.library.referencetype.ListedReferenceTypes;
 import org.spdx.storage.IModelStore.IdType;
 import org.spdx.storage.simple.InMemSpdxStore;
+import org.spdx.tools.SpdxToolsHelper.SerFileType;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -81,7 +82,7 @@ public class OsvToSpdxTest {
 		Relationship describesRelationship = doc.createRelationship(tinymcePackage, RelationshipType.DESCRIBES, null);
 		doc.addRelationship(describesRelationship);
 		StringWriter writer = new StringWriter();
-		Main.spdxToOsv(modelStore, documentUri, writer);
+		Main.spdxToOsv(modelStore, documentUri, writer, true);
 		String resultStr = writer.toString();
 		Type listType = new TypeToken<List<OsvVulnerability>>(){}.getType();
 		List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
@@ -105,7 +106,7 @@ public class OsvToSpdxTest {
 		Relationship describesRelationship = doc.createRelationship(jinjaPackage, RelationshipType.DESCRIBES, null);
 		doc.addRelationship(describesRelationship);
 		StringWriter writer = new StringWriter();
-		Main.spdxToOsv(modelStore, documentUri, writer);
+		Main.spdxToOsv(modelStore, documentUri, writer, true);
 		String resultStr = writer.toString();
 		Type listType = new TypeToken<List<OsvVulnerability>>(){}.getType();
 		List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
@@ -131,7 +132,7 @@ public class OsvToSpdxTest {
 		Relationship describesRelationship = doc.createRelationship(xlsxPackage, RelationshipType.DESCRIBES, null);
 		doc.addRelationship(describesRelationship);
 		StringWriter writer = new StringWriter();
-		Main.spdxToOsv(modelStore, documentUri, writer);
+		Main.spdxToOsv(modelStore, documentUri, writer, true);
 		String resultStr = writer.toString();
 		Type listType = new TypeToken<List<OsvVulnerability>>(){}.getType();
 		List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
@@ -157,7 +158,7 @@ public class OsvToSpdxTest {
 		Relationship describesRelationship = doc.createRelationship(xlsxPackage, RelationshipType.DESCRIBES, null);
 		doc.addRelationship(describesRelationship);
 		StringWriter writer = new StringWriter();
-		Main.spdxToOsv(modelStore, documentUri, writer);
+		Main.spdxToOsv(modelStore, documentUri, writer, true);
 		String resultStr = writer.toString();
 		Type listType = new TypeToken<List<OsvVulnerability>>(){}.getType();
 		List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
@@ -183,7 +184,7 @@ public class OsvToSpdxTest {
 		Relationship describesRelationship = doc.createRelationship(tinymcePackage, RelationshipType.DESCRIBES, null);
 		doc.addRelationship(describesRelationship);
 		StringWriter writer = new StringWriter();
-		Main.spdxToOsv(modelStore, documentUri, writer);
+		Main.spdxToOsv(modelStore, documentUri, writer, true);
 		String resultStr = writer.toString();
 		Type listType = new TypeToken<List<OsvVulnerability>>(){}.getType();
 		List<OsvVulnerability> singleResult = gson.fromJson(resultStr, listType);
@@ -195,7 +196,7 @@ public class OsvToSpdxTest {
         String downloadLocation = "https://www.npmjs.com/package/tinymce/v/4.9.11";
         tinymcePackage.setDownloadLocation(downloadLocation);
         writer = new StringWriter();
-		Main.spdxToOsv(modelStore, documentUri, writer);
+		Main.spdxToOsv(modelStore, documentUri, writer, true);
 		resultStr = writer.toString();
 		List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
 		assertEquals(singleResult.size(), result.size());
@@ -207,7 +208,7 @@ public class OsvToSpdxTest {
 		Path outputDir = Files.createTempDirectory("osv-to-spdx-test");
 		File outputFile = outputDir.resolve("output.json").toFile();
 		try {
-			Main.spdxToOsv(spdxFile, outputFile);
+			Main.spdxToOsv(spdxFile, outputFile, SerFileType.JSON, true);
 			String resultStr = Files.readString(outputFile.toPath());
 			Type listType = new TypeToken<List<OsvVulnerability>>(){}.getType();
 			List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
@@ -244,7 +245,7 @@ public class OsvToSpdxTest {
 		Path outputDir = Files.createTempDirectory("osv-to-spdx-test");
 		File outputFile = outputDir.resolve("output.json").toFile();
 		try {
-			Main.spdxToOsv(spdxFile, outputFile);
+			Main.spdxToOsv(spdxFile, outputFile, SerFileType.TAG, true);
 			String resultStr = Files.readString(outputFile.toPath());
 			Type listType = new TypeToken<List<OsvVulnerability>>(){}.getType();
 			List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
@@ -281,7 +282,7 @@ public class OsvToSpdxTest {
 		Path outputDir = Files.createTempDirectory("osv-to-spdx-test");
 		File outputFile = outputDir.resolve("output.json").toFile();
 		try {
-			Main.spdxToOsv(spdxFile, outputFile);
+			Main.spdxToOsv(spdxFile, outputFile, SerFileType.RDFXML, true);
 			String resultStr = Files.readString(outputFile.toPath());
 			Type listType = new TypeToken<List<OsvVulnerability>>(){}.getType();
 			List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
@@ -318,7 +319,7 @@ public class OsvToSpdxTest {
 		Path outputDir = Files.createTempDirectory("osv-to-spdx-test");
 		File outputFile = outputDir.resolve("output.json").toFile();
 		try {
-			Main.spdxToOsv(spdxFile, outputFile);
+			Main.spdxToOsv(spdxFile, outputFile, SerFileType.XLSX, true);
 			String resultStr = Files.readString(outputFile.toPath());
 			Type listType = new TypeToken<List<OsvVulnerability>>(){}.getType();
 			List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
@@ -349,6 +350,97 @@ public class OsvToSpdxTest {
 		}
 	}
 	
+	
+	@Test
+	public void testPackageDependenciesForward() throws InvalidSPDXAnalysisException, SpdxToOsvException, IOException {
+		InMemSpdxStore modelStore = new InMemSpdxStore();
+		ModelCopyManager copyManager = new ModelCopyManager();
+		String documentUri = "https://org.spdx.documents/this/is/a/test";
+		SpdxDocument doc = SpdxModelFactory.createSpdxDocument(modelStore, documentUri, copyManager);
+		ExternalRef externalRef = doc.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
+				ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("maven-central"), 
+				"org.webjars.npm:xlsx:0.16.6", null);
+		SpdxPackage xlsxPackage = doc.createPackage(modelStore.getNextId(IdType.SpdxId, documentUri), 
+				"xlsx", new SpdxNoAssertionLicense(), "NOASSERTION", new SpdxNoAssertionLicense())
+				.setFilesAnalyzed(false)
+				.addExternalRef(externalRef)
+				.build();
+		String downloadLocation = "https://github.com/pallets/jinja/tree/6879efc2c1596d11a6a6ad296f80063b558d5e0f";
+		SpdxPackage jinjaPackage = doc.createPackage(modelStore.getNextId(IdType.SpdxId, documentUri), 
+				"Jinja", new SpdxNoAssertionLicense(), "NOASSERTION", new SpdxNoAssertionLicense())
+				.setDownloadLocation(downloadLocation)
+				.setFilesAnalyzed(false)
+				.build();
+		SpdxPackage mainPackage = doc.createPackage(modelStore.getNextId(IdType.SpdxId, documentUri), 
+				"main", new SpdxNoAssertionLicense(), "NOASSERTION", new SpdxNoAssertionLicense())
+				.setFilesAnalyzed(false)
+				.build();
+		Relationship describesRelationship = doc.createRelationship(mainPackage, RelationshipType.DESCRIBES, null);
+		doc.addRelationship(describesRelationship);
+		Relationship buildTool = mainPackage.createRelationship(jinjaPackage, RelationshipType.BUILD_TOOL_OF, "");
+		mainPackage.addRelationship(buildTool);
+		Relationship dynamic = mainPackage.createRelationship(xlsxPackage, RelationshipType.DYNAMIC_LINK, "");
+		mainPackage.addRelationship(dynamic);
+		StringWriter writer = new StringWriter();
+		Main.spdxToOsv(modelStore, documentUri, writer, false);
+		String resultStr = writer.toString();
+		Type listType = new TypeToken<List<OsvVulnerability>>(){}.getType();
+		List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
+		assertTrue(result.size() > 0);
+		assertTrue(result.get(0).getAffected().size() > 0);
+        assertEquals("org.webjars.npm:xlsx", result.get(0).getAffected().get(0).getOsvPackage().getName());
+        writer = new StringWriter();
+		Main.spdxToOsv(modelStore, documentUri, writer, true);
+		resultStr = writer.toString();
+		List<OsvVulnerability> result2 = gson.fromJson(resultStr, listType);
+		assertTrue(result2.size() > result.size());
+	}
+	
+	@Test
+	public void testPackageDependenciesReverse() throws InvalidSPDXAnalysisException, SpdxToOsvException, IOException {
+		InMemSpdxStore modelStore = new InMemSpdxStore();
+		ModelCopyManager copyManager = new ModelCopyManager();
+		String documentUri = "https://org.spdx.documents/this/is/a/test";
+		SpdxDocument doc = SpdxModelFactory.createSpdxDocument(modelStore, documentUri, copyManager);
+		ExternalRef externalRef = doc.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
+				ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("maven-central"), 
+				"org.webjars.npm:xlsx:0.16.6", null);
+		SpdxPackage xlsxPackage = doc.createPackage(modelStore.getNextId(IdType.SpdxId, documentUri), 
+				"xlsx", new SpdxNoAssertionLicense(), "NOASSERTION", new SpdxNoAssertionLicense())
+				.setFilesAnalyzed(false)
+				.addExternalRef(externalRef)
+				.build();
+		String downloadLocation = "https://github.com/pallets/jinja/tree/6879efc2c1596d11a6a6ad296f80063b558d5e0f";
+		SpdxPackage jinjaPackage = doc.createPackage(modelStore.getNextId(IdType.SpdxId, documentUri), 
+				"Jinja", new SpdxNoAssertionLicense(), "NOASSERTION", new SpdxNoAssertionLicense())
+				.setDownloadLocation(downloadLocation)
+				.setFilesAnalyzed(false)
+				.build();
+		SpdxPackage mainPackage = doc.createPackage(modelStore.getNextId(IdType.SpdxId, documentUri), 
+				"main", new SpdxNoAssertionLicense(), "NOASSERTION", new SpdxNoAssertionLicense())
+				.setFilesAnalyzed(false)
+				.build();
+		Relationship describesRelationship = doc.createRelationship(mainPackage, RelationshipType.DESCRIBES, null);
+		doc.addRelationship(describesRelationship);
+		Relationship buildTool = mainPackage.createRelationship(jinjaPackage, RelationshipType.BUILD_TOOL_OF, "");
+		mainPackage.addRelationship(buildTool);
+		Relationship generates = mainPackage.createRelationship(mainPackage, RelationshipType.GENERATES, "");
+		xlsxPackage.addRelationship(generates);
+		StringWriter writer = new StringWriter();
+		Main.spdxToOsv(modelStore, documentUri, writer, false);
+		String resultStr = writer.toString();
+		Type listType = new TypeToken<List<OsvVulnerability>>(){}.getType();
+		List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
+		assertTrue(result.size() > 0);
+		assertTrue(result.get(0).getAffected().size() > 0);
+        assertEquals("org.webjars.npm:xlsx", result.get(0).getAffected().get(0).getOsvPackage().getName());
+        writer = new StringWriter();
+		Main.spdxToOsv(modelStore, documentUri, writer, true);
+		resultStr = writer.toString();
+		List<OsvVulnerability> result2 = gson.fromJson(resultStr, listType);
+		assertTrue(result2.size() > result.size());
+	}
+	
 	@Test
 	public void testNpmExternalRefLog4j() throws InvalidSPDXAnalysisException, SpdxToOsvException, IOException {
 		InMemSpdxStore modelStore = new InMemSpdxStore();
@@ -366,7 +458,7 @@ public class OsvToSpdxTest {
 		Relationship describesRelationship = doc.createRelationship(log4jPackage, RelationshipType.DESCRIBES, null);
 		doc.addRelationship(describesRelationship);
 		StringWriter writer = new StringWriter();
-		Main.spdxToOsv(modelStore, documentUri, writer);
+		Main.spdxToOsv(modelStore, documentUri, writer, true);
 		String resultStr = writer.toString();
 		Type listType = new TypeToken<List<OsvVulnerability>>(){}.getType();
 		List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
