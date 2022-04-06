@@ -138,7 +138,7 @@ public class OsvToSpdxTest {
 		List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
 		assertTrue(result.size() > 0);
 		assertTrue(result.get(0).getAffected().size() > 0);
-        assertEquals("org.webjars.npm:xlsx", result.get(0).getAffected().get(0).getOsvPackage().getName());
+        assertEquals("xlsx", result.get(0).getAffected().get(0).getOsvPackage().getName());
 	}
 	
 	@Test
@@ -164,7 +164,7 @@ public class OsvToSpdxTest {
 		List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
 		assertTrue(result.size() > 0);
 		assertTrue(result.get(0).getAffected().size() > 0);
-        assertEquals("org.webjars.npm:xlsx", result.get(0).getAffected().get(0).getOsvPackage().getName());
+        assertEquals("xlsx", result.get(0).getAffected().get(0).getOsvPackage().getName());
 	}
 	
 	@Test
@@ -388,7 +388,7 @@ public class OsvToSpdxTest {
 		List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
 		assertTrue(result.size() > 0);
 		assertTrue(result.get(0).getAffected().size() > 0);
-        assertEquals("org.webjars.npm:xlsx", result.get(0).getAffected().get(0).getOsvPackage().getName());
+        assertEquals("xlsx", result.get(0).getAffected().get(0).getOsvPackage().getName());
         writer = new StringWriter();
 		Main.spdxToOsv(modelStore, documentUri, writer, true);
 		resultStr = writer.toString();
@@ -433,7 +433,7 @@ public class OsvToSpdxTest {
 		List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
 		assertTrue(result.size() > 0);
 		assertTrue(result.get(0).getAffected().size() > 0);
-        assertEquals("org.webjars.npm:xlsx", result.get(0).getAffected().get(0).getOsvPackage().getName());
+        assertEquals("xlsx", result.get(0).getAffected().get(0).getOsvPackage().getName());
         writer = new StringWriter();
 		Main.spdxToOsv(modelStore, documentUri, writer, true);
 		resultStr = writer.toString();
