@@ -294,7 +294,11 @@ public class Main {
                 if (downloadLocation.isPresent()) {
                     Optional<OsvVulnerabilityRequest> pnv = new DownloadLocationParser(downloadLocation.get()).getOsvVulnerabilityRequest();
                     if (pnv.isPresent()) {
-                        pvSet.add(pnv.get());
+                        OsvVulnerabilityRequest req = pnv.get();
+                        if (req.getVersion() == null && req.getCommit() == null && version.isPresent()) {
+                            req.setVersion(version.get());
+                        }
+                        pvSet.add(req);
                     }
                 }
             } catch (InvalidSPDXAnalysisException ex) {
