@@ -67,14 +67,16 @@ public class DownloadLocationParser {
 	private void parseGithub() {
 		String ecosystem = "OSS-Fuzz";
 		String purlPrefix = "pkg:github/";
+		String githubNamePrefix = "github.com/";
 		
 		Matcher matcher = GITHUB_HTTPS_PATTERN.matcher(this.downloadLocation);
 		//NOTE: This match must be done before GITHUB_PAGE_PATTERN since it will also match
 		if (matcher.matches()) {
 			String org = matcher.group(1);
 			String pkg = matcher.group(2);
+
 			this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
-					new OsvPackage(pkg, ecosystem, purlPrefix + org + "/" + pkg), null));
+					new OsvPackage(githubNamePrefix + org + "/" + pkg, null, null), null));
 			return;
 		}
 		
@@ -83,7 +85,7 @@ public class DownloadLocationParser {
 			String org = matcher.group(1);
 			String pkg = matcher.group(2);
 			this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
-					new OsvPackage(pkg, ecosystem, purlPrefix + org + "/" + pkg), null));
+					new OsvPackage(githubNamePrefix + org + "/" + pkg, null, null), null));
 			return;
 		}
 		
@@ -92,7 +94,7 @@ public class DownloadLocationParser {
 			String org = matcher.group(1);
 			String pkg = matcher.group(2);
 			this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
-					new OsvPackage(pkg, ecosystem, purlPrefix + org + "/" + pkg), null));
+					new OsvPackage(githubNamePrefix + org + "/" + pkg, null, null), null));
 			return;
 		}
 		

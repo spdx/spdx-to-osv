@@ -52,7 +52,6 @@ public class OsvPackage {
     public OsvPackage(String name, String ecosystem, @Nullable String purl) {
         Objects.requireNonNull(name, "Package name can not be null");
         this.name = name;
-        Objects.requireNonNull(ecosystem, "Ecosystem must not be null");
         this.ecosystem = ecosystem;
         this.purl = purl;
     }

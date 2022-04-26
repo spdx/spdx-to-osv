@@ -272,7 +272,10 @@ public class Main {
                 Optional<String> packageName = pkg.getName();
                 Optional<String> version = pkg.getVersionInfo();
                 if (packageName.isPresent() && version.isPresent()) {
-                    pvSet.add(new OsvVulnerabilityRequest(new OsvPackage(packageName.get(), "OSS-Fuzz", null),
+                    String pName = packageName.get();
+                    // Trim version info at end of name if it exists
+                    pName = pName.split("@")[0];
+                    pvSet.add(new OsvVulnerabilityRequest(new OsvPackage(pName, null, null),
                             version.get()));
                 }
                 for (ExternalRef externalRef:pkg.getExternalRefs()) {
@@ -295,8 +298,12 @@ public class Main {
                     Optional<OsvVulnerabilityRequest> pnv = new DownloadLocationParser(downloadLocation.get()).getOsvVulnerabilityRequest();
                     if (pnv.isPresent()) {
                         OsvVulnerabilityRequest req = pnv.get();
-                        if (req.getVersion() == null && req.getCommit() == null && version.isPresent()) {
-                            req.setVersion(version.get());
+                        if (req.getVersion() == null && req.getCommit() == null) {
+                            if (version.isPresent()) {
+                                req.setVersion(version.get());
+                            } else {
+                                continue;
+                            }
                         }
                         pvSet.add(req);
                     }
