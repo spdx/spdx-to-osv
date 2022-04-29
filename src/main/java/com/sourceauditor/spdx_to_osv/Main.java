@@ -273,7 +273,10 @@ public class Main {
                 Optional<String> version = pkg.getVersionInfo();
                 if (packageName.isPresent() && version.isPresent()) {
                     String pName = packageName.get();
-                    // Trim version info at end of name if it exists
+
+                    // Some SPDX documents are created with the package name
+                    // including the versions. Although these should be parsed
+                    // by the creator, this code will workaround the package names.
                     pName = pName.split("@")[0];
                     pvSet.add(new OsvVulnerabilityRequest(new OsvPackage(pName, null, null),
                             version.get()));
@@ -302,6 +305,7 @@ public class Main {
                             if (version.isPresent()) {
                                 req.setVersion(version.get());
                             } else {
+                                System.err.printf("Warning: Unable to query package %s due to missing version/commit info", req.getPackage().getName());
                                 continue;
                             }
                         }
@@ -479,5 +483,8 @@ public class Main {
 		HelpFormatter formatter = new HelpFormatter();
 		formatter.printHelp("spdx-to-osv", options);
 	}
+
+
+
 
 }
