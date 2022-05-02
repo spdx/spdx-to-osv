@@ -2,13 +2,13 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.sourceauditor</groupId>
+  <groupId>org.spdx</groupId>
   <artifactId>spdx-to-osv</artifactId>
-  <version>0.0.4-SNAPSHOT</version>
+  <version>0.1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>spdx-to-osv</name>
-  <url>https://github.com/goneall/spdx-to-osv</url>
+  <url>https://github.com/spdx/spdx-to-osv</url>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -26,22 +26,22 @@
 		</developer>
 	</developers>
 	<organization>
-		<name>Source Auditor Inc.</name>
-		<url>http://sourceauditor.com</url>
+		<name>SPDX</name>
+		<url>https://spdx.dev</url>
 	</organization>
 	<scm>
-		<url>https://github.com/goneall/spdx-to-osv</url>
-		<connection>https://github.com/goneall/spdx-to-osv.git</connection>
-		<developerConnection>https://github.com/goneall/spdx-to-osv.git</developerConnection>
+		<url>https://github.com/spdx/spdx-to-osv</url>
+		<connection>https://github.com/spdx/spdx-to-osv.git</connection>
+		<developerConnection>https://github.com/spdx/spdx-to-osv.git</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>Github</system>
-		<url>https://github.com/goneall/spdx-to-osv/issues</url>
+		<url>https://github.com/spdx/spdx-to-osv/issues</url>
 	</issueManagement>
 	<description>Produces an OSV vulnerability JSON report from an SPDX file</description>
 	<ciManagement>
 		<system>Github Actions</system>
-		<url>https://github.com/goneall/spdx-to-osv/actions</url>
+		<url>https://github.com/spdx/spdx-to-osv/actions</url>
 	</ciManagement>
     <distributionManagement>
       <repository>
@@ -167,7 +167,7 @@
 		  <configuration>
 		    <archive>
 		      <manifest>
-		        <mainClass>com.sourceauditor.spdx_to_osv.Main</mainClass>
+		        <mainClass>org.spdx.spdx_to_osv.Main</mainClass>
 		      </manifest>
 		    </archive>
 		    <descriptorRefs>
