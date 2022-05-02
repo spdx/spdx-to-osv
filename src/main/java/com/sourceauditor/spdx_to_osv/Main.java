@@ -272,7 +272,13 @@ public class Main {
                 Optional<String> packageName = pkg.getName();
                 Optional<String> version = pkg.getVersionInfo();
                 if (packageName.isPresent() && version.isPresent()) {
-                    pvSet.add(new OsvVulnerabilityRequest(new OsvPackage(packageName.get(), "OSS-Fuzz", null),
+                    String pName = packageName.get();
+
+                    // Some SPDX documents are created with the package name
+                    // including the versions. Although these should be parsed
+                    // by the creator, this code will workaround the package names.
+                    pName = pName.split("@")[0];
+                    pvSet.add(new OsvVulnerabilityRequest(new OsvPackage(pName, null, null),
                             version.get()));
                 }
                 for (ExternalRef externalRef:pkg.getExternalRefs()) {
@@ -294,7 +300,16 @@ public class Main {
                 if (downloadLocation.isPresent()) {
                     Optional<OsvVulnerabilityRequest> pnv = new DownloadLocationParser(downloadLocation.get()).getOsvVulnerabilityRequest();
                     if (pnv.isPresent()) {
-                        pvSet.add(pnv.get());
+                        OsvVulnerabilityRequest req = pnv.get();
+                        if (req.getVersion() == null && req.getCommit() == null) {
+                            if (version.isPresent()) {
+                                req.setVersion(version.get());
+                            } else {
+                                System.err.printf("Warning: Unable to query package %s due to missing version/commit info", req.getPackage().getName());
+                                continue;
+                            }
+                        }
+                        pvSet.add(req);
                     }
                 }
             } catch (InvalidSPDXAnalysisException ex) {
@@ -468,5 +483,8 @@ public class Main {
 		HelpFormatter formatter = new HelpFormatter();
 		formatter.printHelp("spdx-to-osv", options);
 	}
+
+
+
 
 }

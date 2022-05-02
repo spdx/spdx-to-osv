@@ -95,37 +95,37 @@ public class DownloadLocationParserTest {
 		DownloadLocationParser dlp = new DownloadLocationParser(url);
 		Optional<OsvVulnerabilityRequest> osv = dlp.getOsvVulnerabilityRequest();
 		assertTrue(osv.isPresent());
-		assertEquals("tools-java", osv.get().getPackage().getName());
+		assertEquals("github.com/spdx/tools-java", osv.get().getPackage().getName());
 		assertEquals(null, osv.get().getVersion());
-		assertEquals("pkg:github/spdx/tools-java", osv.get().getPackage().getPurl());
-		assertEquals("OSS-Fuzz", osv.get().getPackage().getEcosystem());
+		assertEquals(null, osv.get().getPackage().getPurl());
+		assertEquals(null, osv.get().getPackage().getEcosystem());
 		
 		url = "https://github.com/spdx/tools-java/releases/tag/v1.0.3";
 		dlp = new DownloadLocationParser(url);
 		osv = dlp.getOsvVulnerabilityRequest();
 		assertTrue(osv.isPresent());
-		assertEquals("tools-java", osv.get().getPackage().getName());
+		assertEquals("github.com/spdx/tools-java", osv.get().getPackage().getName());
 		assertEquals("v1.0.3", osv.get().getVersion());
-		assertEquals("pkg:github/spdx/tools-java@v1.0.3", osv.get().getPackage().getPurl());
-		assertEquals("OSS-Fuzz", osv.get().getPackage().getEcosystem());
+		assertEquals(null, osv.get().getPackage().getPurl());
+		assertEquals(null, osv.get().getPackage().getEcosystem());
 		
 		url = "https://github.com/spdx/tools-java.git";
 		dlp = new DownloadLocationParser(url);
 		osv = dlp.getOsvVulnerabilityRequest();
 		assertTrue(osv.isPresent());
-		assertEquals("tools-java", osv.get().getPackage().getName());
+		assertEquals("github.com/spdx/tools-java", osv.get().getPackage().getName());
 		assertEquals(null, osv.get().getVersion());
-		assertEquals("pkg:github/spdx/tools-java", osv.get().getPackage().getPurl());
-		assertEquals("OSS-Fuzz", osv.get().getPackage().getEcosystem());
+        assertEquals(null, osv.get().getPackage().getPurl());
+		assertEquals(null, osv.get().getPackage().getEcosystem());
 		
 		url = "git@github.com:spdx/tools-java.git";
 		dlp = new DownloadLocationParser(url);
 		osv = dlp.getOsvVulnerabilityRequest();
 		assertTrue(osv.isPresent());
-		assertEquals("tools-java", osv.get().getPackage().getName());
+		assertEquals("github.com/spdx/tools-java", osv.get().getPackage().getName());
 		assertEquals(null, osv.get().getVersion());
-		assertEquals("pkg:github/spdx/tools-java", osv.get().getPackage().getPurl());
-		assertEquals("OSS-Fuzz", osv.get().getPackage().getEcosystem());
+        assertEquals(null, osv.get().getPackage().getPurl());
+		assertEquals(null, osv.get().getPackage().getEcosystem());
 		
 		url = "https://github.com/spdx/tools-java/tree/876c0f1ad03210629cf940505b296e242da97b8e";
 		dlp = new DownloadLocationParser(url);
@@ -137,9 +137,9 @@ public class DownloadLocationParserTest {
 		dlp = new DownloadLocationParser(url);
 		osv = dlp.getOsvVulnerabilityRequest();
 		assertTrue(osv.isPresent());
-		assertEquals("tools-java", osv.get().getPackage().getName());
+		assertEquals("github.com/spdx/tools-java", osv.get().getPackage().getName());
 		assertEquals("v1.0.3", osv.get().getVersion());
-		assertEquals("pkg:github/spdx/tools-java@v1.0.3", osv.get().getPackage().getPurl());
-		assertEquals("OSS-Fuzz", osv.get().getPackage().getEcosystem());
+        assertEquals(null, osv.get().getPackage().getPurl());
+		assertEquals(null, osv.get().getPackage().getEcosystem());
 	}
 }
