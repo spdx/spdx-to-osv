@@ -112,7 +112,7 @@ public class DownloadLocationParser {
 			String pkg = matcher.group(2);
 			String version = matcher.group(3);
 			this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
-					new OsvPackage(pkg, ecosystem, purlPrefix + org + "/" + pkg + "@" + version), version));
+					new OsvPackage(githubNamePrefix + org + "/" + pkg, null, null), version));
 			return;
 		}
 		
@@ -122,7 +122,7 @@ public class DownloadLocationParser {
 			String pkg = matcher.group(2);
 			String version = matcher.group(3);
 			this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
-					new OsvPackage(pkg, ecosystem, purlPrefix + org + "/" + pkg + "@" + version), version));
+					new OsvPackage(githubNamePrefix + org + "/" + pkg, null, null), version));
 			return;
 		}
 	}
