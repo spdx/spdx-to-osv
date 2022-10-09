@@ -55,6 +55,7 @@
 	  <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	  <sonar.organization>spdx</sonar.organization>
 	  <sonar.projectKey>spdx-to-osv</sonar.projectKey>
+	  <dependency-check-maven.version>7.2.1</dependency-check-maven.version>
     </properties>
 	<profiles>
 		<profile>
@@ -103,7 +104,7 @@
     <dependency>
     	<groupId>org.spdx</groupId>
     	<artifactId>tools-java</artifactId>
-    	<version>1.0.4</version>
+    	<version>1.1.1</version>
     </dependency>
     <dependency>
     	<groupId>us.springett</groupId>
@@ -149,41 +150,49 @@
 			</testResource>
 		</testResources>
 		<plugins>
-		<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-compiler-plugin</artifactId>
-			<version>3.6.1</version>
-			<configuration>
-				<source>1.8</source>
-				<target>1.8</target>
-				<encoding>${project.build.sourceEncoding}</encoding>
-				<showDeprecation>true</showDeprecation>
-				<showWarnings>true</showWarnings>
-				<optimize>true</optimize>
-			</configuration>
-		</plugin>
-		<plugin>
-		  <artifactId>maven-assembly-plugin</artifactId>
-		  <configuration>
-		    <archive>
-		      <manifest>
-		        <mainClass>org.spdx.spdx_to_osv.Main</mainClass>
-		      </manifest>
-		    </archive>
-		    <descriptorRefs>
-		      <descriptorRef>jar-with-dependencies</descriptorRef>
-		    </descriptorRefs>
-		  </configuration>
-		  <executions>
-		    <execution>
-		      <id>make-assembly</id>
-		      <phase>package</phase>
-		      <goals>
-		        <goal>single</goal>
-		      </goals>
-		    </execution>
-		  </executions>
-		</plugin>
+			<plugin>
+   				<groupId>org.owasp</groupId>
+   				<artifactId>dependency-check-maven</artifactId>
+   				<version>${dependency-check-maven.version}</version>
+   				<configuration>
+   					<suppressionFiles>dependency-check-supress.xml</suppressionFiles>
+   				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.6.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<showDeprecation>true</showDeprecation>
+					<showWarnings>true</showWarnings>
+					<optimize>true</optimize>
+				</configuration>
+			</plugin>
+			<plugin>
+			  <artifactId>maven-assembly-plugin</artifactId>
+			  <configuration>
+			    <archive>
+			      <manifest>
+			        <mainClass>org.spdx.spdx_to_osv.Main</mainClass>
+			      </manifest>
+			    </archive>
+			    <descriptorRefs>
+			      <descriptorRef>jar-with-dependencies</descriptorRef>
+			    </descriptorRefs>
+			  </configuration>
+			  <executions>
+			    <execution>
+			      <id>make-assembly</id>
+			      <phase>package</phase>
+			      <goals>
+			        <goal>single</goal>
+			      </goals>
+			    </execution>
+			  </executions>
+			</plugin>
 		<plugin>
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-javadoc-plugin</artifactId>
@@ -223,7 +232,7 @@
 		<plugin>
 			<groupId>org.spdx</groupId>
 				<artifactId>spdx-maven-plugin</artifactId>
-				<version>0.5.3</version>
+				<version>0.6.2</version>
 				<executions>
 					<execution>
 						<id>build-spdx</id>
@@ -234,7 +243,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<spdxDocumentNamespace>https://sourceauditor.com/documents/spdx-to-osv-{$version}</spdxDocumentNamespace>					
+					<spdxDocumentNamespace>https://sourceauditor.com/documents/spdx-to-osv-${version}</spdxDocumentNamespace>					
 					<defaultFileCopyright>Copyright (c) 2021 Source Auditor Inc.</defaultFileCopyright>
 					<defaultFileContributors>
 						<param>Gary O'Neall</param>
