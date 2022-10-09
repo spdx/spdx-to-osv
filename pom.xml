@@ -232,7 +232,7 @@
 		<plugin>
 			<groupId>org.spdx</groupId>
 				<artifactId>spdx-maven-plugin</artifactId>
-				<version>0.5.3</version>
+				<version>0.6.2</version>
 				<executions>
 					<execution>
 						<id>build-spdx</id>
@@ -243,7 +243,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<spdxDocumentNamespace>https://sourceauditor.com/documents/spdx-to-osv-{$version}</spdxDocumentNamespace>					
+					<spdxDocumentNamespace>https://sourceauditor.com/documents/spdx-to-osv-${version}</spdxDocumentNamespace>					
 					<defaultFileCopyright>Copyright (c) 2021 Source Auditor Inc.</defaultFileCopyright>
 					<defaultFileContributors>
 						<param>Gary O'Neall</param>
