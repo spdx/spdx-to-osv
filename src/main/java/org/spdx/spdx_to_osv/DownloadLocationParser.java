@@ -31,7 +31,11 @@ public class DownloadLocationParser {
 	
 	static final String GITHUB_PREFIX = "https://github.com/";
 	static final String GITHUB_SSH_PREFIX = "git@github.com:";
-	static final String GITHUB_ORG_PROJECT = "([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)";
+	static final String GITHUB_GIT_PREFIX = "git+";
+	static final String GITHUB_VALID_PART = "[A-Za-z0-9_.\\-]";
+	static final String GITHUB_ORG_PROJECT = "("+GITHUB_VALID_PART+"+)/("+GITHUB_VALID_PART+"+)";
+	static final Pattern GITHUB_GIT_DOWNLOAD_PATTERN = Pattern.compile("git\\+(https://github\\.com/|git@github\\.com:)" + GITHUB_ORG_PROJECT + 
+			"(@"+GITHUB_VALID_PART+"+)?(#"+GITHUB_VALID_PART+"+)?");
 	static final Pattern GITHUB_PAGE_PATTERN = Pattern.compile(GITHUB_PREFIX + GITHUB_ORG_PROJECT + "$");
 	static final Pattern GITHUB_RELEASE_PATTERN = Pattern.compile(GITHUB_PREFIX + GITHUB_ORG_PROJECT + "/releases/tag/([A-Za-z0-9_.-]+)$");
 	static final Pattern GITHUB_HTTPS_PATTERN = Pattern.compile(GITHUB_PREFIX + GITHUB_ORG_PROJECT + "\\.git$");
@@ -56,7 +60,8 @@ public class DownloadLocationParser {
         	parseNpm();
         } else if (downloadLocation.startsWith(NUGET_PREFIX)) {
         	parseNuget();
-        } else if (downloadLocation.startsWith(GITHUB_PREFIX) || downloadLocation.startsWith(GITHUB_SSH_PREFIX)) {
+        } else if (downloadLocation.startsWith(GITHUB_PREFIX) || downloadLocation.startsWith(GITHUB_SSH_PREFIX)
+        		|| downloadLocation.startsWith(GITHUB_GIT_PREFIX)) {
         	parseGithub();
         }
     }
@@ -65,11 +70,22 @@ public class DownloadLocationParser {
      * Parses Github
 	 */
 	private void parseGithub() {
-		String ecosystem = "OSS-Fuzz";
-		String purlPrefix = "pkg:github/";
 		String githubNamePrefix = "github.com/";
 		
-		Matcher matcher = GITHUB_HTTPS_PATTERN.matcher(this.downloadLocation);
+		Matcher matcher = GITHUB_GIT_DOWNLOAD_PATTERN.matcher(this.downloadLocation);
+		if (matcher.matches()) {
+			String org = matcher.group(2);
+			String pkg = matcher.group(3);
+			String version = null;
+			if (matcher.group(4) != null && matcher.group(4).startsWith("@")) {
+				version = matcher.group(4).substring(1);
+			}
+			this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
+					new OsvPackage(githubNamePrefix + org + "/" + pkg, null, null), version));
+			return;
+		}
+		
+		matcher = GITHUB_HTTPS_PATTERN.matcher(this.downloadLocation);
 		//NOTE: This match must be done before GITHUB_PAGE_PATTERN since it will also match
 		if (matcher.matches()) {
 			String org = matcher.group(1);
