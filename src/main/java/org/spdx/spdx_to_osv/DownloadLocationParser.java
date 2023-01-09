@@ -42,6 +42,7 @@ public class DownloadLocationParser {
 	static final Pattern GITHUB_SSH_PATTERN = Pattern.compile(GITHUB_SSH_PREFIX + GITHUB_ORG_PROJECT + "\\.git$");
 	static final Pattern GITHUB_COMMIT_PATTERN = Pattern.compile(GITHUB_PREFIX + GITHUB_ORG_PROJECT + "/tree/([a-f0-9]{40})$");
 	static final Pattern GITHUB_TAG_PATTERN = Pattern.compile(GITHUB_PREFIX + GITHUB_ORG_PROJECT + "/tree/([A-Za-z0-9_.-]+)$");
+	static final Pattern COMMIT_PART_PATTERN = Pattern.compile("[a-f0-9]{40}");
 	
     private String downloadLocation;
     Optional<OsvVulnerabilityRequest> osvVulnerabilityRequest;
@@ -76,12 +77,19 @@ public class DownloadLocationParser {
 		if (matcher.matches()) {
 			String org = matcher.group(2);
 			String pkg = matcher.group(3);
-			String version = null;
 			if (matcher.group(4) != null && matcher.group(4).startsWith("@")) {
-				version = matcher.group(4).substring(1);
+				String versionOrCommit = matcher.group(4).substring(1);
+				if (COMMIT_PART_PATTERN.matcher(versionOrCommit).matches()) {
+					this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(versionOrCommit));
+				} else {
+					this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
+							new OsvPackage(githubNamePrefix + org + "/" + pkg, null, null), versionOrCommit));
+				}
+			} else {
+				this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
+						new OsvPackage(githubNamePrefix + org + "/" + pkg, null, null), null));
 			}
-			this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
-					new OsvPackage(githubNamePrefix + org + "/" + pkg, null, null), version));
+			
 			return;
 		}
 		

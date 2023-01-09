@@ -186,6 +186,12 @@ public class DownloadLocationParserTest {
         assertEquals(null, osv.get().getPackage().getPurl());
 		assertEquals(null, osv.get().getPackage().getEcosystem());
 		
+		url = "git+https://github.com/Exiv2/exiv2@393815ffb09ff68ec704a60439b26d186979402d";
+		dlp = new DownloadLocationParser(url);
+		osv = dlp.getOsvVulnerabilityRequest();
+		assertTrue(osv.isPresent());
+		assertEquals(osv.get().getCommit(), "393815ffb09ff68ec704a60439b26d186979402d");
+		
 		url = "git+git@github.com:fmtlib/fmt@9.1.0#abcd";
 		dlp = new DownloadLocationParser(url);
 		osv = dlp.getOsvVulnerabilityRequest();
