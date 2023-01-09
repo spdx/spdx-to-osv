@@ -11,7 +11,6 @@ import java.util.Optional;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.spdx.spdx_to_osv.DownloadLocationParser;
 import org.spdx.spdx_to_osv.osvmodel.OsvVulnerabilityRequest;
 
 /**
@@ -141,5 +140,70 @@ public class DownloadLocationParserTest {
 		assertEquals("v1.0.3", osv.get().getVersion());
         assertEquals(null, osv.get().getPackage().getPurl());
 		assertEquals(null, osv.get().getPackage().getEcosystem());
+		
+		url = "git+https://github.com/fmtlib/fmt";
+		dlp = new DownloadLocationParser(url);
+		osv = dlp.getOsvVulnerabilityRequest();
+		assertTrue(osv.isPresent());
+		assertEquals("github.com/fmtlib/fmt", osv.get().getPackage().getName());
+		assertEquals(null, osv.get().getVersion());
+        assertEquals(null, osv.get().getPackage().getPurl());
+		assertEquals(null, osv.get().getPackage().getEcosystem());
+		
+		url = "git+https://github.com/fmtlib/fmt@9.1.0";
+		dlp = new DownloadLocationParser(url);
+		osv = dlp.getOsvVulnerabilityRequest();
+		assertTrue(osv.isPresent());
+		assertEquals("github.com/fmtlib/fmt", osv.get().getPackage().getName());
+		assertEquals("9.1.0", osv.get().getVersion());
+        assertEquals(null, osv.get().getPackage().getPurl());
+		assertEquals(null, osv.get().getPackage().getEcosystem());
+		
+		url = "git+https://github.com/fmtlib/fmt@9.1.0#abcd";
+		dlp = new DownloadLocationParser(url);
+		osv = dlp.getOsvVulnerabilityRequest();
+		assertTrue(osv.isPresent());
+		assertEquals("github.com/fmtlib/fmt", osv.get().getPackage().getName());
+		assertEquals("9.1.0", osv.get().getVersion());
+        assertEquals(null, osv.get().getPackage().getPurl());
+		assertEquals(null, osv.get().getPackage().getEcosystem());
+		
+		url = "git+git@github.com:fmtlib/fmt";
+		dlp = new DownloadLocationParser(url);
+		osv = dlp.getOsvVulnerabilityRequest();
+		assertTrue(osv.isPresent());
+		assertEquals("github.com/fmtlib/fmt", osv.get().getPackage().getName());
+		assertEquals(null, osv.get().getVersion());
+        assertEquals(null, osv.get().getPackage().getPurl());
+		assertEquals(null, osv.get().getPackage().getEcosystem());
+		
+		url = "git+git@github.com:fmtlib/fmt@9.1.0";
+		dlp = new DownloadLocationParser(url);
+		osv = dlp.getOsvVulnerabilityRequest();
+		assertTrue(osv.isPresent());
+		assertEquals("github.com/fmtlib/fmt", osv.get().getPackage().getName());
+		assertEquals("9.1.0", osv.get().getVersion());
+        assertEquals(null, osv.get().getPackage().getPurl());
+		assertEquals(null, osv.get().getPackage().getEcosystem());
+		
+		url = "git+https://github.com/Exiv2/exiv2@393815ffb09ff68ec704a60439b26d186979402d";
+		dlp = new DownloadLocationParser(url);
+		osv = dlp.getOsvVulnerabilityRequest();
+		assertTrue(osv.isPresent());
+		assertEquals(osv.get().getCommit(), "393815ffb09ff68ec704a60439b26d186979402d");
+		
+		url = "git+git@github.com:fmtlib/fmt@9.1.0#abcd";
+		dlp = new DownloadLocationParser(url);
+		osv = dlp.getOsvVulnerabilityRequest();
+		assertTrue(osv.isPresent());
+		assertEquals("github.com/fmtlib/fmt", osv.get().getPackage().getName());
+		assertEquals("9.1.0", osv.get().getVersion());
+        assertEquals(null, osv.get().getPackage().getPurl());
+		assertEquals(null, osv.get().getPackage().getEcosystem());
+		
+		url = "git+git@myownserver.com:fmtlib/fmt@9.1.0#abcd";
+		dlp = new DownloadLocationParser(url);
+		osv = dlp.getOsvVulnerabilityRequest();
+		assertFalse(osv.isPresent());
 	}
 }
