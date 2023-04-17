@@ -4,7 +4,7 @@
 
   <groupId>org.spdx</groupId>
   <artifactId>spdx-to-osv</artifactId>
-  <version>0.1.2-SNAPSHOT</version>
+  <version>0.1.2</version>
   <packaging>jar</packaging>
 
   <name>spdx-to-osv</name>
@@ -96,7 +96,7 @@
     <dependency>
     	<groupId>org.spdx</groupId>
     	<artifactId>tools-java</artifactId>
-    	<version>1.1.5</version>
+    	<version>1.1.6</version>
     </dependency>
     <dependency>
     	<groupId>us.springett</groupId>
