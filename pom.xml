@@ -4,7 +4,7 @@
 
   <groupId>org.spdx</groupId>
   <artifactId>spdx-to-osv</artifactId>
-  <version>0.1.2</version>
+  <version>0.1.3-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>spdx-to-osv</name>
