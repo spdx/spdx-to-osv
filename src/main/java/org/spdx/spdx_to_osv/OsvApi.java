@@ -93,6 +93,8 @@ public class OsvApi {
 	            } else {
 	                return new ArrayList<OsvVulnerability>();
 	            }
+	        } else if (con.getResponseCode() == 400) { 
+	        	throw new SpdxToOsvException("Invalid request sent to OSV");
 	        } else {
 	            OsvErrorResponse responseJson = GSON.fromJson(response, OsvErrorResponse.class);
 	            String msg = "Error getting vulnerability data";
