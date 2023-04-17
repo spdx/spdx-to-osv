@@ -30,6 +30,7 @@ public class ExternalRefParser {
     
 	static final Pattern SWH_PATTERN = Pattern.compile("swh:1:(cnt|dir|rev|rel|snp):([0123456789abcdef]{40})$");
     static final Pattern PURL_PATTERN = Pattern.compile("pkg:((?<type>[^?/#@]+)/)((?<namespace>[^?#@]+)/)?(?<name>[^?#@]+)(@(?<version>[^?#]+))?(\\?[^#]+)*(#.+)*$");
+	static final Pattern GIT_CHECKSUM_PATTERN = Pattern.compile("\\b[0-9a-f]{5,40}\\b");
 	
     private boolean useMavenGroupInPkgName = true;
 	private ExternalRef externalRef;
@@ -117,7 +118,13 @@ public class ExternalRefParser {
         String packageName = match.group("name");
         String version = match.group("version");
         if ("github".equals(type) || "bitbucket".equals(type)) {
-        	this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(version));
+        	if (GIT_CHECKSUM_PATTERN.matcher(version).matches()) {
+        		this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(version));
+        	} else {
+        		this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
+    	        		new OsvPackage(packageName, purlTypeToOsvEcosystem(type), 
+    	        				referenceLocator), version));
+        	}
         } else if ("docker".equals(type) && Objects.nonNull(version) && version.startsWith("sha256:")) {
         	this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(version.substring("sha256:".length())));
         } else if ("maven".equals(type) && this.useMavenGroupInPkgName) {
