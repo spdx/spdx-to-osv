@@ -12,8 +12,6 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.spdx.spdx_to_osv.OsvApi;
-import org.spdx.spdx_to_osv.SpdxToOsvException;
 import org.spdx.spdx_to_osv.osvmodel.OsvPackage;
 import org.spdx.spdx_to_osv.osvmodel.OsvVulnerability;
 import org.spdx.spdx_to_osv.osvmodel.OsvVulnerabilityRequest;

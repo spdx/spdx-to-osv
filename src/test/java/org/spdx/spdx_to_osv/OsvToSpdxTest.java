@@ -28,8 +28,6 @@ import org.spdx.library.model.enumerations.ReferenceCategory;
 import org.spdx.library.model.enumerations.RelationshipType;
 import org.spdx.library.model.license.SpdxNoAssertionLicense;
 import org.spdx.library.referencetype.ListedReferenceTypes;
-import org.spdx.spdx_to_osv.Main;
-import org.spdx.spdx_to_osv.SpdxToOsvException;
 import org.spdx.spdx_to_osv.osvmodel.OsvAffected;
 import org.spdx.spdx_to_osv.osvmodel.OsvVulnerability;
 import org.spdx.storage.IModelStore.IdType;
@@ -452,6 +450,44 @@ public class OsvToSpdxTest {
 		ExternalRef externalRef = doc.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
 				ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("maven-central"), 
 				"org.apache.logging.log4j:log4j-core:2.15.0", null);
+		SpdxPackage log4jPackage = doc.createPackage(modelStore.getNextId(IdType.SpdxId, documentUri), 
+				"log4j-core", new SpdxNoAssertionLicense(), "NOASSERTION", new SpdxNoAssertionLicense())
+				.setFilesAnalyzed(false)
+				.addExternalRef(externalRef)
+				.build();
+		Relationship describesRelationship = doc.createRelationship(log4jPackage, RelationshipType.DESCRIBES, null);
+		doc.addRelationship(describesRelationship);
+		StringWriter writer = new StringWriter();
+		Main.spdxToOsv(modelStore, documentUri, writer, true);
+		String resultStr = writer.toString();
+		Type listType = new TypeToken<List<OsvVulnerability>>(){}.getType();
+		List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
+		assertTrue(result.size() > 0);
+		boolean foundPkg = false;
+		for (OsvVulnerability vuln:result) {
+			for (OsvAffected affected:vuln.getAffected()) {
+				if ("org.apache.logging.log4j:log4j-core".equals(affected.getOsvPackage().getName())) {
+					foundPkg = true;
+					break;
+				}
+				if (foundPkg) {
+					break;
+				}
+			}
+		}
+		assertTrue(foundPkg);
+	}
+	
+	@Test
+	public void testPurlEcosystem() throws InvalidSPDXAnalysisException, SpdxToOsvException, IOException {
+		// Test for issue #30
+		InMemSpdxStore modelStore = new InMemSpdxStore();
+		ModelCopyManager copyManager = new ModelCopyManager();
+		String documentUri = "https://org.spdx.documents/this/is/a/test";
+		SpdxDocument doc = SpdxModelFactory.createSpdxDocument(modelStore, documentUri, copyManager);
+		ExternalRef externalRef = doc.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
+				ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("package-url"), 
+				"pkg:maven/org.apache.logging.log4j/log4j- core@2.15.0", null);
 		SpdxPackage log4jPackage = doc.createPackage(modelStore.getNextId(IdType.SpdxId, documentUri), 
 				"log4j-core", new SpdxNoAssertionLicense(), "NOASSERTION", new SpdxNoAssertionLicense())
 				.setFilesAnalyzed(false)
