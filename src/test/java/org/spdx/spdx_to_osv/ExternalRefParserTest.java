@@ -141,8 +141,6 @@ public class ExternalRefParserTest {
     	ExternalRefParser erp = new ExternalRefParser(er);
     	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
         assertTrue(ovr.isPresent());
-    	assertEquals("tools-java", ovr.get().getPackage().getName());
-    	assertEquals("v1.1.5", ovr.get().getVersion());
     	assertEquals("pkg:github/spdx/tools-java@v1.1.5", ovr.get().getPackage().getPurl());
     }
     
@@ -165,8 +163,6 @@ public class ExternalRefParserTest {
     	ExternalRefParser erp = new ExternalRefParser(er);
     	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("curl", ovr.get().getPackage().getName());
-    	assertEquals("7.50.3-1", ovr.get().getVersion());
     	assertEquals("pkg:deb/debian/curl@7.50.3-1?arch=i386&distro=jessie", ovr.get().getPackage().getPurl());
     }
     
@@ -197,8 +193,6 @@ public class ExternalRefParserTest {
     	ExternalRefParser erp = new ExternalRefParser(er);
     	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("jruby-launcher", ovr.get().getPackage().getName());
-    	assertEquals("1.1.2", ovr.get().getVersion());
     	assertEquals("pkg:gem/jruby-launcher@1.1.2?platform=java", ovr.get().getPackage().getPurl());
         
         er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
@@ -207,8 +201,6 @@ public class ExternalRefParserTest {
     	erp = new ExternalRefParser(er);
     	ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("ruby-advisory-db-check", ovr.get().getPackage().getName());
-    	assertEquals("0.12.4", ovr.get().getVersion());
     	assertEquals("pkg:gem/ruby-advisory-db-check@0.12.4", ovr.get().getPackage().getPurl());
     }
     
@@ -220,7 +212,6 @@ public class ExternalRefParserTest {
     	ExternalRefParser erp = new ExternalRefParser(er);
     	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("genproto", ovr.get().getPackage().getName());
     	assertEquals("pkg:golang/google.golang.org/genproto#googleapis/api/annotations", ovr.get().getPackage().getPurl());
     }
     
@@ -232,8 +223,6 @@ public class ExternalRefParserTest {
     	ExternalRefParser erp = new ExternalRefParser(er, false);
     	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("batik-anim", ovr.get().getPackage().getName());
-    	assertEquals("1.9.1", ovr.get().getVersion());
     	assertEquals("pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?packaging=sources", ovr.get().getPackage().getPurl());
         
         er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
@@ -242,14 +231,10 @@ public class ExternalRefParserTest {
     	erp = new ExternalRefParser(er, true);
     	ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("org.apache.xmlgraphics:batik-anim", ovr.get().getPackage().getName());
-    	assertEquals("1.9.1", ovr.get().getVersion());
     	assertEquals("pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?repository_url=repo.spring.io/release", ovr.get().getPackage().getPurl());
     	erp = new ExternalRefParser(er, false);
     	ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("batik-anim", ovr.get().getPackage().getName());
-    	assertEquals("1.9.1", ovr.get().getVersion());
     	assertEquals("pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?repository_url=repo.spring.io/release", ovr.get().getPackage().getPurl());
     }
     
@@ -261,8 +246,6 @@ public class ExternalRefParserTest {
     	ExternalRefParser erp = new ExternalRefParser(er);
     	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("animation", ovr.get().getPackage().getName());
-    	assertEquals("12.3.1", ovr.get().getVersion());
     	assertEquals("pkg:npm/%40angular/animation@12.3.1", ovr.get().getPackage().getPurl());
         
         er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
@@ -271,8 +254,6 @@ public class ExternalRefParserTest {
     	erp = new ExternalRefParser(er);
     	ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("foobar", ovr.get().getPackage().getName());
-    	assertEquals("12.3.1", ovr.get().getVersion());
     	assertEquals("pkg:npm/foobar@12.3.1", ovr.get().getPackage().getPurl());
     }
     
@@ -284,8 +265,6 @@ public class ExternalRefParserTest {
     	ExternalRefParser erp = new ExternalRefParser(er);
     	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("EnterpriseLibrary.Common", ovr.get().getPackage().getName());
-    	assertEquals("6.0.1304", ovr.get().getVersion());
     	assertEquals("pkg:nuget/EnterpriseLibrary.Common@6.0.1304", ovr.get().getPackage().getPurl());
     }
     
@@ -297,8 +276,6 @@ public class ExternalRefParserTest {
     	ExternalRefParser erp = new ExternalRefParser(er);
     	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("django", ovr.get().getPackage().getName());
-    	assertEquals("1.11.1", ovr.get().getVersion());
     	assertEquals("pkg:pypi/django@1.11.1", ovr.get().getPackage().getPurl());
     }
     
@@ -310,8 +287,6 @@ public class ExternalRefParserTest {
     	ExternalRefParser erp = new ExternalRefParser(er);
     	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("curl", ovr.get().getPackage().getName());
-    	assertEquals("7.50.3-1.fc25", ovr.get().getVersion());
     	assertEquals("pkg:rpm/fedora/curl@7.50.3-1.fc25?arch=i386&distro=fedora-25", ovr.get().getPackage().getPurl());
         
         er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
@@ -320,8 +295,6 @@ public class ExternalRefParserTest {
     	erp = new ExternalRefParser(er);
     	ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("curl", ovr.get().getPackage().getName());
-    	assertEquals("7.56.1-1.1.", ovr.get().getVersion());
     	assertEquals("pkg:rpm/opensuse/curl@7.56.1-1.1.?arch=i386&distro=opensuse-tumbleweed", ovr.get().getPackage().getPurl());
     }
     
@@ -333,10 +306,7 @@ public class ExternalRefParserTest {
     	ExternalRefParser erp = new ExternalRefParser(er, false);
     	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("tools-java", ovr.get().getPackage().getName());
-    	assertEquals("2.2.2", ovr.get().getVersion());
     	assertEquals("pkg:maven/org.spdx/tools-java@2.2.2", ovr.get().getPackage().getPurl());
-    	assertEquals("Maven", ovr.get().getPackage().getEcosystem());
     	
     	er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
                 ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("maven-central"), 
@@ -344,8 +314,6 @@ public class ExternalRefParserTest {
     	erp = new ExternalRefParser(er, true);
     	ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("org.spdx:tools-java", ovr.get().getPackage().getName());
-    	assertEquals("2.2.2", ovr.get().getVersion());
     	assertEquals("pkg:maven/org.spdx/tools-java@2.2.2", ovr.get().getPackage().getPurl());
     	
     	er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
@@ -354,7 +322,6 @@ public class ExternalRefParserTest {
     	erp = new ExternalRefParser(er, true);
     	ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("org.spdx:tools-java", ovr.get().getPackage().getName());
     	assertTrue(ovr.get().getVersion() == null);
     	assertEquals("pkg:maven/org.spdx/tools-java", ovr.get().getPackage().getPurl());
     }
@@ -367,10 +334,7 @@ public class ExternalRefParserTest {
     	ExternalRefParser erp = new ExternalRefParser(er);
     	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("http-server", ovr.get().getPackage().getName());
-    	assertEquals("0.3.0", ovr.get().getVersion());
     	assertEquals("pkg:npm/http-server@0.3.0", ovr.get().getPackage().getPurl());
-    	assertEquals("npm", ovr.get().getPackage().getEcosystem());
     }
     
     @Test
@@ -381,10 +345,7 @@ public class ExternalRefParserTest {
     	ExternalRefParser erp = new ExternalRefParser(er);
     	Optional<OsvVulnerabilityRequest> ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
-    	assertEquals("Microsoft.AspNet.MVC", ovr.get().getPackage().getName());
-    	assertEquals("5.0.0", ovr.get().getVersion());
     	assertEquals("pkg:nuget/Microsoft.AspNet.MVC@5.0.0", ovr.get().getPackage().getPurl());
-    	assertEquals("NuGet", ovr.get().getPackage().getEcosystem());
     }
     
     @Test

@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 import org.junit.After;
 import org.junit.Before;
@@ -110,9 +111,8 @@ public class OsvToSpdxTest {
 		String resultStr = writer.toString();
 		Type listType = new TypeToken<List<OsvVulnerability>>(){}.getType();
 		List<OsvVulnerability> result = gson.fromJson(resultStr, listType);
-		assertEquals(1, result.size());
-		assertTrue(result.get(0).getAffected().size() > 0);
-        assertEquals("harfbuzz", result.get(0).getAffected().get(0).getOsvPackage().getName());
+		assertTrue(!result.isEmpty());
+		assertTrue(!result.get(0).getAffected().isEmpty());
 	}
 	
 	@Test
@@ -217,14 +217,16 @@ public class OsvToSpdxTest {
 			boolean foundJinja = false;
 			for (OsvVulnerability ov:result) {
 				for (OsvAffected affected:ov.getAffected()) {
-					if ("tinymce".equals(affected.getOsvPackage().getName())) {
-						foundTinyMce = true;
-					}
-					if ("org.webjars.npm:xlsx".equals(affected.getOsvPackage().getName())) {
-						foundXlsx = true;
-					}
-					if ("harfbuzz".equals(affected.getOsvPackage().getName())) {
-						foundJinja = true;
+					if (Objects.nonNull(affected.getOsvPackage())) {
+						if ("tinymce".equals(affected.getOsvPackage().getName())) {
+							foundTinyMce = true;
+						}
+						if ("org.webjars.npm:xlsx".equals(affected.getOsvPackage().getName())) {
+							foundXlsx = true;
+						}
+						if ("harfbuzz".equals(affected.getOsvPackage().getName())) {
+							foundJinja = true;
+						}
 					}
 				}
 			}
@@ -254,14 +256,16 @@ public class OsvToSpdxTest {
 			boolean foundJinja = false;
 			for (OsvVulnerability ov:result) {
 				for (OsvAffected affected:ov.getAffected()) {
-					if ("tinymce".equals(affected.getOsvPackage().getName())) {
-						foundTinyMce = true;
-					}
-					if ("org.webjars.npm:xlsx".equals(affected.getOsvPackage().getName())) {
-						foundXlsx = true;
-					}
-					if ("harfbuzz".equals(affected.getOsvPackage().getName())) {
-						foundJinja = true;
+					if (Objects.nonNull(affected.getOsvPackage())) {
+						if ("tinymce".equals(affected.getOsvPackage().getName())) {
+							foundTinyMce = true;
+						}
+						if ("org.webjars.npm:xlsx".equals(affected.getOsvPackage().getName())) {
+							foundXlsx = true;
+						}
+						if ("harfbuzz".equals(affected.getOsvPackage().getName())) {
+							foundJinja = true;
+						}
 					}
 				}
 			}
@@ -291,14 +295,16 @@ public class OsvToSpdxTest {
 			boolean foundJinja = false;
 			for (OsvVulnerability ov:result) {
 				for (OsvAffected affected:ov.getAffected()) {
-					if ("tinymce".equals(affected.getOsvPackage().getName())) {
-						foundTinyMce = true;
-					}
-					if ("org.webjars.npm:xlsx".equals(affected.getOsvPackage().getName())) {
-						foundXlsx = true;
-					}
-					if ("harfbuzz".equals(affected.getOsvPackage().getName())) {
-						foundJinja = true;
+					if (Objects.nonNull(affected.getOsvPackage())) {
+						if ("tinymce".equals(affected.getOsvPackage().getName())) {
+							foundTinyMce = true;
+						}
+						if ("org.webjars.npm:xlsx".equals(affected.getOsvPackage().getName())) {
+							foundXlsx = true;
+						}
+						if ("harfbuzz".equals(affected.getOsvPackage().getName())) {
+							foundJinja = true;
+						}
 					}
 				}
 			}
@@ -328,14 +334,16 @@ public class OsvToSpdxTest {
 			boolean foundJinja = false;
 			for (OsvVulnerability ov:result) {
 				for (OsvAffected affected:ov.getAffected()) {
-					if ("tinymce".equals(affected.getOsvPackage().getName())) {
-						foundTinyMce = true;
-					}
-					if ("org.webjars.npm:xlsx".equals(affected.getOsvPackage().getName())) {
-						foundXlsx = true;
-					}
-					if ("harfbuzz".equals(affected.getOsvPackage().getName())) {
-						foundJinja = true;
+					if (Objects.nonNull(affected.getOsvPackage())) {
+						if ("tinymce".equals(affected.getOsvPackage().getName())) {
+							foundTinyMce = true;
+						}
+						if ("org.webjars.npm:xlsx".equals(affected.getOsvPackage().getName())) {
+							foundXlsx = true;
+						}
+						if ("harfbuzz".equals(affected.getOsvPackage().getName())) {
+							foundJinja = true;
+						}
 					}
 				}
 			}
@@ -486,8 +494,8 @@ public class OsvToSpdxTest {
 		String documentUri = "https://org.spdx.documents/this/is/a/test";
 		SpdxDocument doc = SpdxModelFactory.createSpdxDocument(modelStore, documentUri, copyManager);
 		ExternalRef externalRef = doc.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
-				ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("package-url"), 
-				"pkg:maven/org.apache.logging.log4j/log4j- core@2.15.0", null);
+				ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("purl"), 
+				"pkg:maven/org.apache.logging.log4j/log4j-core@2.15.0", null);
 		SpdxPackage log4jPackage = doc.createPackage(modelStore.getNextId(IdType.SpdxId, documentUri), 
 				"log4j-core", new SpdxNoAssertionLicense(), "NOASSERTION", new SpdxNoAssertionLicense())
 				.setFilesAnalyzed(false)

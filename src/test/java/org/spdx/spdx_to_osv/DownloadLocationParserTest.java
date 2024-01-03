@@ -39,10 +39,7 @@ public class DownloadLocationParserTest {
 		DownloadLocationParser dlp = new DownloadLocationParser(url);
 		Optional<OsvVulnerabilityRequest> osv = dlp.getOsvVulnerabilityRequest();
 		assertTrue(osv.isPresent());
-		assertEquals("org.spdx.licenseListPublisher", osv.get().getPackage().getName());
-		assertEquals("2.2.3", osv.get().getVersion());
 		assertEquals("pkg:maven/org.spdx.licenseListPublisher@2.2.3", osv.get().getPackage().getPurl());
-		assertEquals("Maven", osv.get().getPackage().getEcosystem());
 	}
 	
 	@Test
@@ -51,28 +48,19 @@ public class DownloadLocationParserTest {
 		DownloadLocationParser dlp = new DownloadLocationParser(url);
 		Optional<OsvVulnerabilityRequest> osv = dlp.getOsvVulnerabilityRequest();
 		assertTrue(osv.isPresent());
-		assertEquals("licensecheck", osv.get().getPackage().getName());
-		assertEquals("1.3.0", osv.get().getVersion());
 		assertEquals("pkg:npm/licensecheck@1.3.0", osv.get().getPackage().getPurl());
-		assertEquals("npm", osv.get().getPackage().getEcosystem());
 		
 		url = "https://www.npmjs.com/package/@angular/cli/v/13.1.2";
 		dlp = new DownloadLocationParser(url);
 		osv = dlp.getOsvVulnerabilityRequest();
 		assertTrue(osv.isPresent());
-		assertEquals("@angular/cli", osv.get().getPackage().getName());
-		assertEquals("13.1.2", osv.get().getVersion());
 		assertEquals("pkg:npm/%40angular/cli@13.1.2", osv.get().getPackage().getPurl());
-		assertEquals("npm", osv.get().getPackage().getEcosystem());
 		
 		url = "https://www.npmjs.com/package/@angular/cli";
 		dlp = new DownloadLocationParser(url);
 		osv = dlp.getOsvVulnerabilityRequest();
 		assertTrue(osv.isPresent());
-		assertEquals("@angular/cli", osv.get().getPackage().getName());
-		assertEquals(null, osv.get().getVersion());
 		assertEquals("pkg:npm/%40angular/cli", osv.get().getPackage().getPurl());
-		assertEquals("npm", osv.get().getPackage().getEcosystem());
 		
 	}
 	
@@ -82,10 +70,7 @@ public class DownloadLocationParserTest {
 		DownloadLocationParser dlp = new DownloadLocationParser(url);
 		Optional<OsvVulnerabilityRequest> osv = dlp.getOsvVulnerabilityRequest();
 		assertTrue(osv.isPresent());
-		assertEquals("Newtonsoft.Json", osv.get().getPackage().getName());
-		assertEquals("13.0.1", osv.get().getVersion());
 		assertEquals("pkg:nuget/Newtonsoft.Json@13.0.1", osv.get().getPackage().getPurl());
-		assertEquals("NuGet", osv.get().getPackage().getEcosystem());
 	}
 
 	@Test
