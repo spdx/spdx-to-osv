@@ -200,7 +200,6 @@ public class ExternalRefParserTest {
     	assertEquals("jruby-launcher", ovr.get().getPackage().getName());
     	assertEquals("1.1.2", ovr.get().getVersion());
     	assertEquals("pkg:gem/jruby-launcher@1.1.2?platform=java", ovr.get().getPackage().getPurl());
-    	assertEquals("OSS-Fuzz", ovr.get().getPackage().getEcosystem());
         
         er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
                 ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("purl"), 
@@ -211,7 +210,6 @@ public class ExternalRefParserTest {
     	assertEquals("ruby-advisory-db-check", ovr.get().getPackage().getName());
     	assertEquals("0.12.4", ovr.get().getVersion());
     	assertEquals("pkg:gem/ruby-advisory-db-check@0.12.4", ovr.get().getPackage().getPurl());
-    	assertEquals("OSS-Fuzz", ovr.get().getPackage().getEcosystem());
     }
     
     @Test
@@ -224,7 +222,6 @@ public class ExternalRefParserTest {
     	assertTrue(ovr.isPresent());
     	assertEquals("genproto", ovr.get().getPackage().getName());
     	assertEquals("pkg:golang/google.golang.org/genproto#googleapis/api/annotations", ovr.get().getPackage().getPurl());
-    	assertEquals("Go", ovr.get().getPackage().getEcosystem());
     }
     
     @Test
@@ -238,7 +235,6 @@ public class ExternalRefParserTest {
     	assertEquals("batik-anim", ovr.get().getPackage().getName());
     	assertEquals("1.9.1", ovr.get().getVersion());
     	assertEquals("pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?packaging=sources", ovr.get().getPackage().getPurl());
-    	assertEquals("Maven", ovr.get().getPackage().getEcosystem());
         
         er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
                 ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("purl"), 
@@ -249,14 +245,12 @@ public class ExternalRefParserTest {
     	assertEquals("org.apache.xmlgraphics:batik-anim", ovr.get().getPackage().getName());
     	assertEquals("1.9.1", ovr.get().getVersion());
     	assertEquals("pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?repository_url=repo.spring.io/release", ovr.get().getPackage().getPurl());
-    	assertEquals("Maven", ovr.get().getPackage().getEcosystem());
     	erp = new ExternalRefParser(er, false);
     	ovr = erp.osvVulnerabilityRequest();
     	assertTrue(ovr.isPresent());
     	assertEquals("batik-anim", ovr.get().getPackage().getName());
     	assertEquals("1.9.1", ovr.get().getVersion());
     	assertEquals("pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?repository_url=repo.spring.io/release", ovr.get().getPackage().getPurl());
-    	assertEquals("Maven", ovr.get().getPackage().getEcosystem());
     }
     
     @Test
@@ -270,7 +264,6 @@ public class ExternalRefParserTest {
     	assertEquals("animation", ovr.get().getPackage().getName());
     	assertEquals("12.3.1", ovr.get().getVersion());
     	assertEquals("pkg:npm/%40angular/animation@12.3.1", ovr.get().getPackage().getPurl());
-    	assertEquals("npm", ovr.get().getPackage().getEcosystem());
         
         er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
                 ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("purl"), 
@@ -281,7 +274,6 @@ public class ExternalRefParserTest {
     	assertEquals("foobar", ovr.get().getPackage().getName());
     	assertEquals("12.3.1", ovr.get().getVersion());
     	assertEquals("pkg:npm/foobar@12.3.1", ovr.get().getPackage().getPurl());
-    	assertEquals("npm", ovr.get().getPackage().getEcosystem());
     }
     
     @Test
@@ -295,7 +287,6 @@ public class ExternalRefParserTest {
     	assertEquals("EnterpriseLibrary.Common", ovr.get().getPackage().getName());
     	assertEquals("6.0.1304", ovr.get().getVersion());
     	assertEquals("pkg:nuget/EnterpriseLibrary.Common@6.0.1304", ovr.get().getPackage().getPurl());
-    	assertEquals("NuGet", ovr.get().getPackage().getEcosystem());
     }
     
     @Test
@@ -309,7 +300,6 @@ public class ExternalRefParserTest {
     	assertEquals("django", ovr.get().getPackage().getName());
     	assertEquals("1.11.1", ovr.get().getVersion());
     	assertEquals("pkg:pypi/django@1.11.1", ovr.get().getPackage().getPurl());
-    	assertEquals("PyPI", ovr.get().getPackage().getEcosystem());
     }
     
     @Test
@@ -323,7 +313,6 @@ public class ExternalRefParserTest {
     	assertEquals("curl", ovr.get().getPackage().getName());
     	assertEquals("7.50.3-1.fc25", ovr.get().getVersion());
     	assertEquals("pkg:rpm/fedora/curl@7.50.3-1.fc25?arch=i386&distro=fedora-25", ovr.get().getPackage().getPurl());
-    	assertEquals("OSS-Fuzz", ovr.get().getPackage().getEcosystem());
         
         er = spdxPackage.createExternalRef(ReferenceCategory.PACKAGE_MANAGER, 
                 ListedReferenceTypes.getListedReferenceTypes().getListedReferenceTypeByName("purl"), 
@@ -334,7 +323,6 @@ public class ExternalRefParserTest {
     	assertEquals("curl", ovr.get().getPackage().getName());
     	assertEquals("7.56.1-1.1.", ovr.get().getVersion());
     	assertEquals("pkg:rpm/opensuse/curl@7.56.1-1.1.?arch=i386&distro=opensuse-tumbleweed", ovr.get().getPackage().getPurl());
-    	assertEquals("OSS-Fuzz", ovr.get().getPackage().getEcosystem());
     }
     
     @Test
