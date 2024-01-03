@@ -49,11 +49,11 @@ public class OsvPackage {
      * @param ecosystem Ecosystem supported by OSV
      * @param purl Optional Package URL
      */
-    public OsvPackage(String name, String ecosystem, @Nullable String purl) {
+    public OsvPackage(@Nullable String name, @Nullable String ecosystem, @Nullable String purl) {
         Objects.requireNonNull(name, "Package name can not be null");
-        this.name = name;
-        this.ecosystem = ecosystem;
         this.purl = purl;
+        this.ecosystem = Objects.isNull(purl) ? ecosystem : null; // OSV does not allow an ecosystem if purl is specified
+        this.name = Objects.isNull(purl) ? name : null; // OSV does not allow an name if purl is specified
     }
     
     /**
@@ -85,14 +85,14 @@ public class OsvPackage {
     /**
      * @return the name
      */
-    public String getName() {
+    public @Nullable String getName() {
         return name;
     }
 
     /**
      * @return the ecosystem
      */
-    public String getEcosystem() {
+    public @Nullable String getEcosystem() {
         return ecosystem;
     }
 

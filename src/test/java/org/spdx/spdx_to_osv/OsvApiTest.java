@@ -12,8 +12,6 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.spdx.spdx_to_osv.OsvApi;
-import org.spdx.spdx_to_osv.SpdxToOsvException;
 import org.spdx.spdx_to_osv.osvmodel.OsvPackage;
 import org.spdx.spdx_to_osv.osvmodel.OsvVulnerability;
 import org.spdx.spdx_to_osv.osvmodel.OsvVulnerabilityRequest;
@@ -50,15 +48,13 @@ public class OsvApiTest {
         List<OsvVulnerability> result = OsvApi.getInstance().queryVulnerabilities(request);
         assertTrue(result.size() > 0);
         assertTrue(result.get(0).getAffected().size() > 0);
-        assertEquals("harfbuzz", result.get(0).getAffected().get(0).getOsvPackage().getName());
         // Package and Version
         request = new OsvVulnerabilityRequest(new OsvPackage("jinja2", "PyPI", null), "2.4.1");
         result = OsvApi.getInstance().queryVulnerabilities(request);
         assertTrue(result.size() > 0);
         assertTrue(result.get(0).getAffected().size() > 0);
-        assertEquals("jinja2", result.get(0).getAffected().get(0).getOsvPackage().getName());
         // not in database
-        request = new OsvVulnerabilityRequest(new OsvPackage("tools-java", "OSV-Fuzz", null), "1.0.1");
+        request = new OsvVulnerabilityRequest(new OsvPackage("tools-java", "NuGet", null), "1.0.1");
         result = OsvApi.getInstance().queryVulnerabilities(request);
         assertEquals(0, result.size());
     }

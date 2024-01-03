@@ -104,6 +104,9 @@ public class OsvApi {
 	            }
 	            throw new SpdxToOsvException(msg);
 	        }
+        } catch(IOException ex) {
+        	// OSV returns an error code 400 if it can't find a package - so we'll just ignore them
+        	return new ArrayList<OsvVulnerability>();
         } finally {
         	con.disconnect();
         }

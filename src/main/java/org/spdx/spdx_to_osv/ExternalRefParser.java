@@ -122,7 +122,7 @@ public class ExternalRefParser {
         		this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(version));
         	} else {
         		this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
-    	        		new OsvPackage(packageName, purlTypeToOsvEcosystem(type), 
+    	        		new OsvPackage(packageName, null, 
     	        				referenceLocator), version));
         	}
         } else if ("docker".equals(type) && Objects.nonNull(version) && version.startsWith("sha256:")) {
@@ -130,36 +130,14 @@ public class ExternalRefParser {
         } else if ("maven".equals(type) && this.useMavenGroupInPkgName) {
         	packageName = match.group("namespace").replaceAll("/", ".") + ":" + packageName;
         	this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
-	        		new OsvPackage(packageName, purlTypeToOsvEcosystem(type), 
+	        		new OsvPackage(packageName, null, 
 	        				referenceLocator), version));
         } else {
 	        this.osvVulnerabilityRequest = Optional.of(new OsvVulnerabilityRequest(
-	        		new OsvPackage(packageName, purlTypeToOsvEcosystem(type), 
+	        		new OsvPackage(packageName, null, 
 	        				referenceLocator), version));
         }
     }
-
-    /**
-	 * @param purlType purl type
-	 * @return Osv Scheme
-	 */
-	private String purlTypeToOsvEcosystem(String purlType) {
-		if (Objects.isNull(purlType) || purlType.isEmpty()) {
-			return "OSS-Fuzz";
-		} else if (purlType.equals("pypi")) {
-			return "PyPI";
-		} else if (purlType.equals("golang")) {
-			return "Go";
-		} else if (purlType.equals("maven")) {
-			return "Maven";
-		} else if (purlType.equals("npm")) {
-			return "npm";
-		} else if (purlType.equals("nuget")) {
-			return "NuGet";
-		} else {
-			return "OSS-Fuzz";
-		}
-	}
 
 	/**
      * @param referenceLocator
